@@ -1,5 +1,5 @@
 <?php
-namespace Foundation\Debug;
+namespace Foundation\Tools;
 
 abstract class Debug {
 
