@@ -3,13 +3,13 @@ namespace Foundation\Traits;
 
 abstract class Singleton {
 
-  protected static $instance;
+	protected static $instance;
 
-  protected function __construct() {}
+	protected function __construct() {}
 
-  public static function getInstance() {
+	public static function getInstance() {
 
-    if(empty(static::$instance)) static::$instance = new static;
-    return static::$instance;
-  }
+		if(empty(static::$instance)) static::$instance = new static;
+		return static::$instance;
+	}
 }
