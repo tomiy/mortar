@@ -8,8 +8,6 @@ use Mortar\Http\Router;
 
 class Mortar extends Singleton {
 
-	private $router;
-
 	protected function __construct() {
 		ob_start();
 	}
@@ -20,6 +18,6 @@ class Mortar extends Singleton {
 
 		//display
 
-    return !$debug?:$error_reporting;
+    echo $debug?$error_reporting:null;
   }
 }

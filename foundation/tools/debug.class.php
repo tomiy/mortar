@@ -7,11 +7,7 @@ abstract class Debug {
 		static $functionRef = 0;
 		if(!$functionRef) {
 			$functionRef = 'a'.uniqid();
-			echo
-				"<script>function $functionRef(id){e=document.getElementById(id),
-				d='inline-block',b=document.getElementById('btn-'+id);
-				e.style.display=e.style.display==d?'none':d;
-				b.innerHTML=b.innerHTML=='+'?'-':'+';}</script>";
+			echo "<script>function $functionRef(id){e=document.getElementById(id), d='inline-block',b=document.getElementById('btn-'+id); e.style.display=e.style.display==d?'none':d; b.innerHTML=b.innerHTML=='+'?'-':'+';}</script>";
 		}
 
 		$output = '';
@@ -32,10 +28,8 @@ abstract class Debug {
 			}
 
 			$c = (100 - ($depth + 1) * 5) % 50;
-			$output .=
-			"<button id='btn-$id' onclick='$functionRef(\"$id\")'>+</button>
-				<span id='$id' style='border:1px solid #bbb;padding:2px;
-				margin:2px;background:hsl(0,0%,$c%);display:none;'>";
+			$output .= "<button id='btn-$id' style='font-family:monospace;' onclick='$functionRef(\"$id\")'>+</button>
+      <span id='$id' style='border:1px solid #bbb;padding:2px; margin:2px;background:hsl(0,0%,$c%);display:none;'>";
 
 			$noitems = true;
 			foreach($o as $k => $v) {
@@ -49,8 +43,7 @@ abstract class Debug {
 				is_null($o)?'&lt;NULL&gt;':"$o"
 			)."</b>";
 		} if($depth == 0)
-				echo "<pre style='display:inline-block;border:1px solid #bbb;
-				padding:2px;margin:2px;'>$output</pre>"; else return $output;
+		echo "<pre style='border:1px solid #bbb; padding:2px;margin:2px;'>$output</pre>"; else return $output;
 	}
 
 	private static function dismount($object) {
