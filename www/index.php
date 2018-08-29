@@ -5,6 +5,7 @@ use Mortar\Http\Router;
 
 $mortar = Mortar::getInstance();
 
-include_once $mortar->routes();
-
+Router::routes();
 Router::dispatch();
+
+$mortar->display(true);

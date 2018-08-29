@@ -1,10 +1,11 @@
 <?php
 use Mortar\Http\Router;
+use Foundation\Tools\Debug;
 
 Router::get('/', function($mortar) {
-	$mortar->debug('👍');
+	Debug::show($mortar);
 });
 
 Router::get('/:key/', function($mortar, $arguments) {
-	$mortar->debug($arguments);
+	Debug::show($arguments);
 });

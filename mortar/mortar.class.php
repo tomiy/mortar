@@ -14,11 +14,12 @@ class Mortar extends Singleton {
 		ob_start();
 	}
 
-	public function routes() {
-		return Router::routes();
-	}
+	public function display($debug = false) {
+    $error_reporting = ob_get_contents();
+    ob_end_clean();
 
-	public function debug($obj) {
-		return Debug::show($obj);
-	}
+		//display
+
+    return !$debug?:$error_reporting;
+  }
 }

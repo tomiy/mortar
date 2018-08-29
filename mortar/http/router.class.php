@@ -3,14 +3,14 @@ namespace Mortar\Http;
 
 use Mortar\Mortar;
 
-class Router {
+	abstract class Router {
 	private static $get = [];
 	private static $post = [];
 	private static $put = [];
 	private static $delete = [];
 
 	public function routes() {
-		return CLASS_DIR.'app/routes.php';
+		require_once CLASS_DIR.'app/routes.php';
 	}
 
 	public static function get($route, $callback) {
