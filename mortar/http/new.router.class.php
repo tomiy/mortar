@@ -9,7 +9,8 @@ abstract class Router {
 	private static $methods = ['GET', 'POST', 'PUT', 'DELETE'];
 	private static $shorthands = [
 		'int' => '\d',
-		'str' => '[a-zA-Z-]'
+		'str' => '[a-zA-Z-]',
+		'all' => '[\w-]'
 	];
 
 	public static function routes() {
@@ -48,12 +49,8 @@ abstract class Router {
 
 	private static function parseRoute($route) {
 		$parsedRoute = $route[0] == '/'?'\/':'';
-		$aRoute = $remainingRoute = explode('/', $route);
+		$aRoute = $remainingRoute = array_filter(explode('/', $route));
 		foreach($aRoute as $routePart) {
-			if(empty($routePart)) {
-				array_shift($remainingRoute);
-				continue;
-			}
 			if(strpos($routePart, '?')) {
 				$remainingRoute[0] = str_replace('?', '', $routePart);
 				$parsedRoute .= '('.static::parseRoute(implode('/', $remainingRoute)).')?';
@@ -63,7 +60,7 @@ abstract class Router {
 				$pattern = str_replace(
 					array_keys(static::$shorthands),
 					array_values(static::$shorthands),
-					empty($m['pattern'])?'str':$m['pattern']);
+					empty($m['pattern'])?'all':$m['pattern']);
 				$parsedRoute .= "(?P<{$m['name']}>$pattern+)\/";
 			} else $parsedRoute .= $routePart.'\/';
 			array_shift($remainingRoute);
