@@ -3,7 +3,7 @@ namespace Mortar\Http;
 
 use Mortar\Mortar;
 
-	abstract class Router {
+abstract class Router {
 	private static $routes = [];
 
 	private static $methods = ['GET', 'POST', 'PUT', 'DELETE'];
@@ -17,19 +17,19 @@ use Mortar\Mortar;
 	}
 
 	public static function get($route, $callback, $before = null) {
-		return static::addRoute('GET', $route, $callback, $before);
+		static::addRoute('GET', $route, $callback, $before);
 	}
 
 	public static function post($route, $callback, $before = null) {
-		return static::addRoute('POST', $route, $callback, $before);
+		static::addRoute('POST', $route, $callback, $before);
 	}
 
 	public static function put($route, $callback, $before = null) {
-		return static::addRoute('PUT', $route, $callback, $before);
+		static::addRoute('PUT', $route, $callback, $before);
 	}
 
 	public static function delete($route, $callback, $before = null) {
-		return static::addRoute('DELETE', $route, $callback, $before);
+		static::addRoute('DELETE', $route, $callback, $before);
 	}
 
 	private static function addRoute($method, $route, $callback, $before) {
@@ -72,19 +72,28 @@ use Mortar\Mortar;
 	}
 
 	public static function dispatch() {
+		$found = false;
 		$uri = str_replace(dirname($_SERVER['PHP_SELF']), '', $_SERVER['REQUEST_URI']);
 		$method = (isset($_POST['_method']) && in_array(static::$methods, strtoupper($_POST['_method'])))
 			?strtoupper($_POST['_method']):strtoupper($_SERVER['REQUEST_METHOD']);
 
 		if(in_array(static::$routes[$method], $uri)) {
+			$found = true;
 			if($before != null) static::$routes[$method]['before']();
 			static::$routes[$method]['callback']();
 		} else foreach (static::$routes[$method] as $route => list($callback, $before)) {
 			if(preg_match($route, $uri, $arguments)) {
+				$found = true;
 				if($before != null) $before();
 				call_user_func_array($callback, $arguments);
 				break;
 			}
+		}
+		//TODO: proper 404
+		if(!$found) {
+			header($_SERVER["SERVER_PROTOCOL"]." 404 Not Found");
+			echo '404';
+			exit;
 		}
 	}
 }
