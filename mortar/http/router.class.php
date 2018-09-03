@@ -3,83 +3,148 @@ namespace Mortar\Http;
 
 use Mortar\Mortar;
 
-	abstract class Router {
-	private static $get = [];
-	private static $post = [];
-	private static $put = [];
-	private static $delete = [];
+abstract class Router {
+	private static $routes = [];
+	private static $group;
 
-	public function routes() {
+	private static $methods = ['GET', 'POST', 'PUT', 'DELETE'];
+	private static $shorthands = [
+		'int' => '\d',
+		'str' => '[a-zA-Z-]',
+		'all' => '[\w-]'
+	];
+
+	public static function routes() {
 		require_once CLASS_DIR.'app/routes.php';
 	}
 
-	public static function get($route, $callback) {
-		static::$get[$route] = $callback;
+	public static function get($route, $callback, $before = null) {
+		static::addRoute('GET', $route, $callback, $before);
 	}
 
-	public static function post($route, $callback) {
-		static::$post[$route] = $callback;
+	public static function post($route, $callback, $before = null) {
+		static::addRoute('POST', $route, $callback, $before);
 	}
 
-	public static function put($route, $callback) {
-		static::$put[$route] = $callback;
+	public static function put($route, $callback, $before = null) {
+		static::addRoute('PUT', $route, $callback, $before);
 	}
 
-	public static function delete($route, $callback) {
-		static::$delete[$route] = $callback;
+	public static function delete($route, $callback, $before = null) {
+		static::addRoute('DELETE', $route, $callback, $before);
 	}
 
-	public static function dispatch() {
-		$route = str_replace(dirname($_SERVER['PHP_SELF']), '', $_SERVER['REQUEST_URI']);
+	private static function addRoute($method, $route, $callback, $before) {
+		if(static::$group != null) {
+			$route = rtrim(static::$group['route'], '/').'/'.ltrim($route, '/');
+		}
 
-		switch(strtoupper($_SERVER['REQUEST_METHOD'])) {
-			case 'GET': static::check(static::$get, $route);
-			break;
+		if(strpos($route, ':')) {
+			$route = static::parseRoute($route);
+		} else $route = str_replace('/', '\/', $route);
 
-			case 'POST': static::check(static::$post, $route);
-			break;
+		if(!is_callable($callback)) {
+			if(strpos($callback, '@')) {
+				list($controller, $function) = explode('@', $callback);
+				if(method_exists($controller, $function)) {
+					$callback = [
+						'class' => $controller,
+						'function' => $function
+					];
+				}
+			}
+		}
 
-			case 'PUT': static::check(static::$put, $route);
-			break;
+		if(!is_callable($before)) {
+			if(method_exists($before, 'handle')) {
+				$before = [
+					'class' => $before,
+					'function' => 'handle'
+				];
+			}
+		}
 
-			case 'DELETE': static::check(static::$delete, $route);
-			break;
+		static::$routes[$method][$route] = [
+			'callback' => $callback,
+			'before' => [
+				$before
+			]
+		];
 
-			default: http_response_code(405);
-				break;
+		if(static::$group['before'] != null) {
+			static::$routes[$method][$route]['before'][] = static::$group['before'];
 		}
 	}
 
-	private static function check($array, $route) {
-		//simple route, callback and bail out
-		if(isset($array[$route])) {
-			$array[$route](Mortar::getInstance());
-			return true;
-		} else {
-			$arRoute = explode('/', $route);
-			foreach ($array as $regexRoute => $callback) {
-				$arguments = [];
-				$found = true;
-				foreach(explode('/', $regexRoute) as $index => $regexRoutePart) {
-					//assign argument
-					if(preg_match('/:(?P<name>.+)/', $regexRoutePart, $m)) {
-						$arguments[$m['name']] = $arRoute[$index];
-						continue;
-					}
-					//mismatch, stop checking
-					if(!isset($arRoute[$index]) || $arRoute[$index] != $regexRoutePart) {
-						$found = false;
-						break;
-					}
-				}
-				if($found) {
-					$callback(Mortar::getInstance(), $arguments);
-					return true;
-				}
+	private static function group($route, $callback, $before = null) {
+		static::$group = [
+			'route' => $route,
+			'before' => $before
+		];
+		$callback();
+		static::$group = null;
+	}
+
+	private static function parseRoute($route) {
+		$parsedRoute = $route[0] == '/'?'\/':'';
+		$aRoute = $remainingRoute = array_filter(explode('/', $route));
+		foreach($aRoute as $routePart) {
+			if(strpos($routePart, '?')) {
+				$remainingRoute[0] = str_replace('?', '', $routePart);
+				$parsedRoute .= '('.static::parseRoute(implode('/', $remainingRoute)).')?';
+				break;
 			}
-			//custom 404
-			http_response_code(404);
-			return false;
+			if(preg_match('/(?P<pattern>.*):(?P<name>.+)/', $routePart, $m)) {
+				$pattern = str_replace(
+					array_keys(static::$shorthands),
+					array_values(static::$shorthands),
+					empty($m['pattern'])?'all':$m['pattern']);
+				$parsedRoute .= "(?P<{$m['name']}>$pattern+)\/";
+			} else $parsedRoute .= $routePart.'\/';
+			array_shift($remainingRoute);
+		}
+		return $parsedRoute;
+	}
+
+	public static function dispatch() {
+		$found = false;
+		$uri = str_replace(dirname($_SERVER['PHP_SELF']), '', $_SERVER['REQUEST_URI']);
+		$method = (isset($_POST['_method']) && in_array(strtoupper($_POST['_method']), static::$methods))
+			?strtoupper($_POST['_method']):strtoupper($_SERVER['REQUEST_METHOD']);
+
+		if(in_array($uri, static::$routes[$method])) {
+			$found = true;
+			if(static::$routes[$method]['before'] != null) static::$routes[$method]['before']();
+			static::$routes[$method]['callback']();
+
+		} else foreach (static::$routes[$method] as $route => $callbacks) {
+			$callback = $callbacks['callback'];
+			$before = $callbacks['before'];
+			if(preg_match("/^$route$/", $uri, $arguments)) {
+				$found = true;
+				$arguments = array_filter($arguments, function($key) {
+					return !is_numeric($key);
+				}, '2');
+
+				foreach ($before as $middleware) {
+					if(is_callable($middleware)) $middleware();
+					else if(is_array($middleware)) {
+						call_user_func([$middleware['class'], $middleware['function']]);
+					}
+				}
+
+				if(is_callable($callback)) call_user_func_array($callback, $arguments);
+				else if(is_array($callback)) {
+					call_user_func_array([$callback['class'], $callback['function']], $arguments);
+				}
+				break;
+			}
+		}
+		//TODO: proper 404
+		if(!$found) {
+			header($_SERVER["SERVER_PROTOCOL"]." 404 Not Found");
+			echo '404';
+			exit;
 		}
 	}
 }

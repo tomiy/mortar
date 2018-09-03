@@ -2,10 +2,9 @@
 use Mortar\Http\Router;
 use Foundation\Tools\Debug;
 
-Router::get('/', function($mortar) {
-	Debug::show($mortar);
+Router::get('/', function() {
+	echo 'hello world';
 });
-
-Router::get('/:key/', function($mortar, $arguments) {
-	Debug::show($arguments);
+Router::get('/int:key/str:test?/', function($key, $test = 'lol') {
+	echo "$key/$test";
 });
