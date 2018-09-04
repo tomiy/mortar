@@ -108,9 +108,17 @@ abstract class Router {
 
 	public static function dispatch() {
 		$found = false;
-		$uri = str_replace(dirname($_SERVER['PHP_SELF']), '', $_SERVER['REQUEST_URI']);
+		$uri = explode('?', str_replace(dirname($_SERVER['PHP_SELF']), '', $_SERVER['REQUEST_URI']))[0];
 		$method = (isset($_POST['_method']) && in_array(strtoupper($_POST['_method']), static::$methods))
 			?strtoupper($_POST['_method']):strtoupper($_SERVER['REQUEST_METHOD']);
+
+		//TODO: csrf protection here
+		// <input type="hidden" name="token" value="<?php echo hash_hmac('sha256', $uri, $_SESSION['csrf_token']); ? >" />
+
+		// $calc = hash_hmac('sha256', '$uri, $_SESSION['csrf_token']);
+		// if (hash_equals($calc, $_POST['token'])) {
+		//     // Continue...
+		// }
 
 		if(in_array($uri, static::$routes[$method])) {
 			$found = true;
