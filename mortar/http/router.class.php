@@ -4,8 +4,11 @@ namespace Mortar\Http;
 use Mortar\Mortar;
 
 abstract class Router {
+
 	private static $routes = [];
 	private static $group;
+
+	private static $notfound;
 
 	private static $methods = ['GET', 'POST', 'PUT', 'DELETE'];
 	private static $shorthands = [
@@ -16,6 +19,10 @@ abstract class Router {
 
 	public static function routes() {
 		require_once CLASS_DIR.'app/routes.php';
+	}
+
+	private static notFound($callback) {
+		static::$notfound = $callback;
 	}
 
 	public static function get($route, $callback, $before = null) {
@@ -113,7 +120,7 @@ abstract class Router {
 			?strtoupper($_POST['_method']):strtoupper($_SERVER['REQUEST_METHOD']);
 
 		//TODO: csrf protection here
-		// <input type="hidden" name="token" value="<?php echo hash_hmac('sha256', $uri, $_SESSION['csrf_token']); ? >" />
+		// <input type="hidden" name="token" value="<?= hash_hmac('sha256', $uri, $_SESSION['csrf_token']); ? >" />
 
 		// $calc = hash_hmac('sha256', '$uri, $_SESSION['csrf_token']);
 		// if (hash_equals($calc, $_POST['token'])) {
@@ -148,10 +155,11 @@ abstract class Router {
 				break;
 			}
 		}
-		//TODO: proper 404
+
 		if(!$found) {
 			header($_SERVER["SERVER_PROTOCOL"]." 404 Not Found");
-			echo '404';
+			if(is_callable(static::$notfound)) $notfound();
+			else echo '404 Not Found';
 			exit;
 		}
 	}
