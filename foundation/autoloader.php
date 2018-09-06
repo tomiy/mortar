@@ -1,4 +1,10 @@
-<?php session_start();
+<?php
+/**
+ * Gets the relative path between two paths
+ * @param  string $from the source path
+ * @param  string $to   the destination path
+ * @return string       the relative path
+ */
 function relativePath($from, $to) {
 	$arFrom = explode(DIRECTORY_SEPARATOR, rtrim($from, DIRECTORY_SEPARATOR));
 	$arTo = explode(DIRECTORY_SEPARATOR, rtrim($to, DIRECTORY_SEPARATOR));
