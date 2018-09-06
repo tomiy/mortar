@@ -10,4 +10,7 @@ _it's not obligatory but strongly recommended that you put your mortar directory
 * __V0.1__ _(initial version)_
 	* autoloader
 	* singleton core
-	* basic http routing
+	* http routing
+
+* __V0.2__
+	* middleware and controller support
