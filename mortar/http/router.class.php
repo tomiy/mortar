@@ -52,36 +52,36 @@ abstract class Router {
 
 	/**
 	 * Shorthand function for get requests
-	 * @param  string   $route    the route we want to match
-	 * @param  callback $callback the callback called when the route is matched
-	 * @param  mixed    $before   the middleware called before if the route is matched
+	 * @param string $route    the route we want to match
+	 * @param mixed  $callback the callback called when the route is matched
+	 * @param mixed  $before   the middleware called before if the route is matched
 	 */
 	public static function get($route, $callback, $before = null) {
 		static::addRoute('GET', $route, $callback, $before);
 	}
 	/**
 	 * Shorthand function for post requests
-	 * @param  string   $route    the route we want to match
-	 * @param  callback $callback the callback called when the route is matched
-	 * @param  mixed    $before   the middleware called before if the route is matched
+	 * @param string $route    the route we want to match
+	 * @param mixed  $callback the callback called when the route is matched
+	 * @param mixed  $before   the middleware called before if the route is matched
 	 */
 	public static function post($route, $callback, $before = null) {
 		static::addRoute('POST', $route, $callback, $before);
 	}
 	/**
 	 * Shorthand function for put requests
-	 * @param  string   $route    the route we want to match
-	 * @param  callback $callback the callback called when the route is matched
-	 * @param  mixed    $before   the middleware called before if the route is matched
+	 * @param string $route    the route we want to match
+	 * @param mixed  $callback the callback called when the route is matched
+	 * @param mixed  $before   the middleware called before if the route is matched
 	 */
 	public static function put($route, $callback, $before = null) {
 		static::addRoute('PUT', $route, $callback, $before);
 	}
 	/**
 	 * Shorthand function for delete requests
-	 * @param  string   $route    the route we want to match
-	 * @param  callback $callback the callback called when the route is matched
-	 * @param  mixed    $before   the middleware called before if the route is matched
+	 * @param string $route    the route we want to match
+	 * @param mixed  $callback the callback called when the route is matched
+	 * @param mixed  $before   the middleware called before if the route is matched
 	 */
 	public static function delete($route, $callback, $before = null) {
 		static::addRoute('DELETE', $route, $callback, $before);
@@ -89,17 +89,18 @@ abstract class Router {
 
 	/**
 	 * Adds a parsed route to the collection with its callback and middleware(s)
-	 * @param string   $method   the method that should match this route
-	 * @param string   $route    the route we want to match
-	 * @param callback $callback the callback called when the route is matched
-	 * @param mixed    $before   the middleware called before if the route is matched
+	 * @param string $method   the method that should match this route
+	 * @param string $route    the route we want to match
+	 * @param mixed  $callback the callback called when the route is matched
+	 * @param mixed  $before   the middleware called before if the route is matched
 	 */
 	private static function addRoute($method, $route, $callback, $before) {
-		//TODO: force slashes on both sides
+		// force slashes on both sides
+		$route = '/'.trim($route,'/').'/';
 
 		// prepend group route if we can
 		if(static::$group != null) {
-			$route = rtrim(static::$group['route'], '/').'/'.ltrim($route, '/');
+			$route = rtrim(static::$group['route'], '/').$route;
 		}
 
 		// if dynamic route, parse, else just make it regex friendly
@@ -140,16 +141,15 @@ abstract class Router {
 
 		// add group middleware if we can
 		if(static::$group['before'] != null) {
-			//TODO: check for middleware method and unshift instead of append
-			static::$routes[$method][$route]['before'][] = static::$group['before'];
+			array_unshift(static::$routes[$method][$route]['before'], static::$group['before']);
 		}
 	}
 
 	/**
 	 * Set a group then walk through a callback of routes to apply it
-	 * @param  string   $route    the route prefix
-	 * @param  callback $callback the callback of routes
-	 * @param  mixed    $before   the group middleware
+	 * @param string   $route    the route prefix
+	 * @param callback $callback the callback of routes
+	 * @param mixed    $before   the group middleware
 	 */
 	private static function group($route, $callback, $before = null) {
 		static::$group = [
@@ -217,12 +217,9 @@ abstract class Router {
 		if(in_array(str_replace('/', '\/', $uri), static::$routes[$method])) {
 			$found = true;
 			foreach (static::$routes[$method]['before'] as $middleware) {
-				if(is_callable($middleware)) $middleware();
-				else if(is_array($middleware)) {
-					call_user_func([$middleware['class'], $middleware['function']]);
-				}
+				static::call($middleware);
 			}
-			static::$routes[$method]['callback']();
+			static::call($routes[$method]['callback']);
 
 		// else try looping through the table and match a regex
 		} else foreach (static::$routes[$method] as $route => $callbacks) {
@@ -237,16 +234,10 @@ abstract class Router {
 				}, '2');
 
 				foreach ($before as $middleware) {
-					if(is_callable($middleware)) $middleware();
-					else if(is_array($middleware)) {
-						call_user_func([$middleware['class'], $middleware['function']]);
-					}
+					static::call($middleware);
 				}
 
-				if(is_callable($callback)) call_user_func_array($callback, $arguments);
-				else if(is_array($callback)) {
-					call_user_func_array([$callback['class'], $callback['function']], $arguments);
-				}
+				static::call($callback);
 				break;
 			}
 		}
@@ -257,6 +248,13 @@ abstract class Router {
 			if(is_callable(static::$notfound)) $notfound();
 			else echo '404 Not Found';
 			exit;
+		}
+	}
+
+	private static call($callback, $arguments = null) {
+		if(is_callable($callback)) $callback(...$arguments);
+		else if(is_array($callback)) {
+			call_user_func_array([$callback['class'], $callback['function']], $arguments);
 		}
 	}
 }
