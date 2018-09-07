@@ -46,7 +46,7 @@ abstract class Router {
 	 * Sets the 404 callback
 	 * @var callback
 	 */
-	private static notFound($callback) {
+	private static function notFound($callback) {
 		static::$notfound = $callback;
 	}
 
@@ -96,8 +96,7 @@ abstract class Router {
 	 */
 	private static function addRoute($method, $route, $callback, $before) {
 		// force slashes on both sides
-		$route = '/'.trim($route,'/').'/';
-
+		$route = '/'.trim($route,'/').($route=='/'?'':'/');
 		// prepend group route if we can
 		if(static::$group != null) {
 			$route = rtrim(static::$group['route'], '/').$route;
@@ -134,15 +133,14 @@ abstract class Router {
 		// add route to collection
 		static::$routes[$method][$route] = [
 			'callback' => $callback,
-			'before' => [
-				$before
-			]
+			'before' => []
 		];
 
 		// add group middleware if we can
 		if(static::$group['before'] != null) {
-			array_unshift(static::$routes[$method][$route]['before'], static::$group['before']);
+			static::$routes[$method][$route]['before'][] = static::$group['before'];
 		}
+		if($before != null) static::$routes[$method][$route]['before'][] = $before;
 	}
 
 	/**
@@ -214,12 +212,12 @@ abstract class Router {
 		// }
 
 		// if static method, callback and bail out
-		if(in_array(str_replace('/', '\/', $uri), static::$routes[$method])) {
+		if(array_key_exists($static_uri = str_replace('/', '\/', $uri), static::$routes[$method])) {
 			$found = true;
-			foreach (static::$routes[$method]['before'] as $middleware) {
+			foreach (static::$routes[$method][$static_uri]['before'] as $middleware) {
 				static::call($middleware);
 			}
-			static::call($routes[$method]['callback']);
+			static::call(static::$routes[$method][$static_uri]['callback']);
 
 		// else try looping through the table and match a regex
 		} else foreach (static::$routes[$method] as $route => $callbacks) {
@@ -234,10 +232,10 @@ abstract class Router {
 				}, '2');
 
 				foreach ($before as $middleware) {
-					static::call($middleware);
+					static::call($middleware, $arguments);
 				}
 
-				static::call($callback);
+				static::call($callback, $arguments);
 				break;
 			}
 		}
@@ -251,8 +249,8 @@ abstract class Router {
 		}
 	}
 
-	private static call($callback, $arguments = null) {
-		if(is_callable($callback)) $callback(...$arguments);
+	private static function call($callback, $arguments = []) {
+		if(is_callable($callback)) call_user_func_array($callback, $arguments);
 		else if(is_array($callback)) {
 			call_user_func_array([$callback['class'], $callback['function']], $arguments);
 		}
