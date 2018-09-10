@@ -3,17 +3,12 @@ namespace Mortar\Http;
 
 use Mortar\Mortar;
 
-abstract class Router {
+class Router {
 	/**
 	 * The routes + attached middleware
 	 * @var array
 	 */
 	private static $routes = [];
-	/**
-	 * The current group prefix + attached middleware
-	 * @var array
-	 */
-	private static $group;
 	/**
 	 * The 404 callback
 	 * @var callback
@@ -34,7 +29,24 @@ abstract class Router {
 		'str' => '[a-zA-Z-]',
 		'all' => '[\w-]'
 	];
+	/**
+	* The current group prefix + attached middleware
+	* @var array
+	*/
+	private $group;
 
+
+	/**
+	 * Instanciate a new router
+	 * @param string $prefix the route group
+	 * @param mixed  $before the group middleware
+	 */
+	public function __construct($prefix = null, $before = null) {
+		$this->group = [
+			'route' => $prefix,
+			'before' => $before
+		];
+	}
 	/**
 	 * Includes the routes file
 	 */
@@ -56,8 +68,8 @@ abstract class Router {
 	 * @param mixed  $callback the callback called when the route is matched
 	 * @param mixed  $before   the middleware called before if the route is matched
 	 */
-	public static function get($route, $callback, $before = null) {
-		static::addRoute('GET', $route, $callback, $before);
+	public function get($route, $callback, $before = null) {
+		$this->addRoute('GET', $route, $callback, $before);
 	}
 	/**
 	 * Shorthand function for post requests
@@ -65,8 +77,8 @@ abstract class Router {
 	 * @param mixed  $callback the callback called when the route is matched
 	 * @param mixed  $before   the middleware called before if the route is matched
 	 */
-	public static function post($route, $callback, $before = null) {
-		static::addRoute('POST', $route, $callback, $before);
+	public function post($route, $callback, $before = null) {
+		$this->addRoute('POST', $route, $callback, $before);
 	}
 	/**
 	 * Shorthand function for put requests
@@ -74,8 +86,8 @@ abstract class Router {
 	 * @param mixed  $callback the callback called when the route is matched
 	 * @param mixed  $before   the middleware called before if the route is matched
 	 */
-	public static function put($route, $callback, $before = null) {
-		static::addRoute('PUT', $route, $callback, $before);
+	public function put($route, $callback, $before = null) {
+		$this->addRoute('PUT', $route, $callback, $before);
 	}
 	/**
 	 * Shorthand function for delete requests
@@ -83,8 +95,18 @@ abstract class Router {
 	 * @param mixed  $callback the callback called when the route is matched
 	 * @param mixed  $before   the middleware called before if the route is matched
 	 */
-	public static function delete($route, $callback, $before = null) {
-		static::addRoute('DELETE', $route, $callback, $before);
+	public function delete($route, $callback, $before = null) {
+		$this->addRoute('DELETE', $route, $callback, $before);
+	}
+
+	private function fixRoute($route) {
+		// force slashes on both sides
+		$route = '/'.trim($route,'/').($route=='/'?'':'/');
+		// prepend group route if we can
+		if($this->group['route'] != null) {
+			$route = rtrim($this->group['route'], '/').$route;
+		}
+		return $route;
 	}
 
 	/**
@@ -94,13 +116,8 @@ abstract class Router {
 	 * @param mixed  $callback the callback called when the route is matched
 	 * @param mixed  $before   the middleware called before if the route is matched
 	 */
-	private static function addRoute($method, $route, $callback, $before) {
-		// force slashes on both sides
-		$route = '/'.trim($route,'/').($route=='/'?'':'/');
-		// prepend group route if we can
-		if(static::$group != null) {
-			$route = rtrim(static::$group['route'], '/').$route;
-		}
+	private function addRoute($method, $route, $callback, $before) {
+		$route = $this->fixRoute($route);
 
 		// if dynamic route, parse, else just make it regex friendly
 		if(strpos($route, ':')) {
@@ -112,7 +129,7 @@ abstract class Router {
 
 		// check for middleware methods
 		$before = static::processCallback($before);
-		static::$group['before'] = static::processCallback(static::$group['before']);
+		$this->group['before'] = static::processCallback($this->group['before']);
 
 		// add route to collection
 		static::$routes[$method][$route] = [
@@ -121,8 +138,8 @@ abstract class Router {
 		];
 
 		// add group middleware if we can
-		if(static::$group['before'] != null) {
-			static::$routes[$method][$route]['before'][] = static::$group['before'];
+		if($this->group['before'] != null) {
+			static::$routes[$method][$route]['before'][] = $this->group['before'];
 		}
 		if($before != null) static::$routes[$method][$route]['before'][] = $before;
 	}
@@ -133,13 +150,9 @@ abstract class Router {
 	 * @param callback $callback the callback of routes
 	 * @param mixed    $before   the group middleware
 	 */
-	private static function group($route, $callback, $before = null) {
-		static::$group = [
-			'route' => $route,
-			'before' => $before
-		];
-		$callback();
-		static::$group = null;
+	private function group($route, $callback, $before = null) {
+		$route = $this->fixRoute($route);
+		$callback(new self($route, $before));
 	}
 
 	/**
@@ -245,7 +258,8 @@ abstract class Router {
 		// if not found display 404
 		if(!$found) {
 			header($_SERVER["SERVER_PROTOCOL"]." 404 Not Found");
-			if(is_callable(static::$notfound)) $notfound();
+			//TODO: fix the 404 to behave like other callbacks
+			if(is_callable(static::$notfound)) static::$notfound();
 			else echo '404 Not Found';
 			exit;
 		}
