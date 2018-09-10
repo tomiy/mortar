@@ -2,20 +2,26 @@
 use Mortar\Http\Router;
 use Foundation\Tools\Debug;
 
-Router::get('/', function() {
+$router = new Router();
+
+$router->get('/', function() {
 	Debug::show('hello world');
 });
 
-Router::group('/controller/', function() {
-	Router::get('/', 'App\Controller\TestController@test');
-	Router::get('/int:key/', 'App\Controller\TestController@key');
+$router->group('/controller/', function($routerGroup) {
+	$routerGroup->get('/', 'App\Controller\TestController@test');
+	$routerGroup->get('/int:key/', 'App\Controller\TestController@key');
+
+	$routerGroup->group('/test/', function($secondGroup) {
+		$secondGroup->get('/int:key/', 'App\Controller\TestController@key');
+	});
 }, 'App\Middleware\TestMiddleware');
 
-Router::get('/int:key/str:test?/', function($key, $test = 'default') {
+$router->get('/int:key/str:test?/', function($key, $test = 'default') {
 	Debug::show("$key/$test");
 	Debug::show($_GET);
 });
 
-Router::get('/middleware/', function() {
+$router->get('/middleware/', function() {
 	echo '2nd';
 }, 'App\Middleware\TestMiddleware');
