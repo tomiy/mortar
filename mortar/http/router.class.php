@@ -108,27 +108,11 @@ abstract class Router {
 		} else $route = str_replace('/', '\/', $route);
 
 		// check for controller methods
-		if(!is_callable($callback)) {
-			if(strpos($callback, '@')) {
-				list($controller, $function) = explode('@', $callback);
-				if(method_exists($controller, $function)) {
-					$callback = [
-						'class' => $controller,
-						'function' => $function
-					];
-				}
-			}
-		}
+		$callback = static::processCallback($callback);
 
 		// check for middleware methods
-		if(!is_callable($before)) {
-			if(method_exists($before, 'handle')) {
-				$before = [
-					'class' => $before,
-					'function' => 'handle'
-				];
-			}
-		}
+		$before = static::processCallback($before);
+		static::$group['before'] = static::processCallback(static::$group['before']);
 
 		// add route to collection
 		static::$routes[$method][$route] = [
@@ -156,6 +140,24 @@ abstract class Router {
 		];
 		$callback();
 		static::$group = null;
+	}
+
+	/**
+	 * turns a controller/middleware call to a callback-able array if needed
+	 * @param  mixed $callback the callback to process
+	 * @return mixed           a closure or a class/function callback array
+	 */
+	private static function processCallback($callback) {
+		if(is_array($callback) || is_null($callback)) return $callback;
+		if(!is_callable($callback)) {
+			if(strpos($callback, '@')) {
+				list($class, $function) = explode('@', $callback);
+			} else list($class, $function) = [$callback, 'handle'];
+				if(method_exists($class, $function)) {
+					$callback = [$class, $function];
+				}
+		}
+		return $callback;
 	}
 
 	/**
@@ -215,9 +217,9 @@ abstract class Router {
 		if(array_key_exists($static_uri = str_replace('/', '\/', $uri), static::$routes[$method])) {
 			$found = true;
 			foreach (static::$routes[$method][$static_uri]['before'] as $middleware) {
-				static::call($middleware);
+				call_user_func($middleware);
 			}
-			static::call(static::$routes[$method][$static_uri]['callback']);
+			call_user_func(static::$routes[$method][$static_uri]['callback']);
 
 		// else try looping through the table and match a regex
 		} else foreach (static::$routes[$method] as $route => $callbacks) {
@@ -232,10 +234,10 @@ abstract class Router {
 				}, '2');
 
 				foreach ($before as $middleware) {
-					static::call($middleware, $arguments);
+					call_user_func_array($middleware, $arguments);
 				}
 
-				static::call($callback, $arguments);
+				call_user_func_array($callback, $arguments);
 				break;
 			}
 		}
@@ -246,13 +248,6 @@ abstract class Router {
 			if(is_callable(static::$notfound)) $notfound();
 			else echo '404 Not Found';
 			exit;
-		}
-	}
-
-	private static function call($callback, $arguments = []) {
-		if(is_callable($callback)) call_user_func_array($callback, $arguments);
-		else if(is_array($callback)) {
-			call_user_func_array([$callback['class'], $callback['function']], $arguments);
 		}
 	}
 }
