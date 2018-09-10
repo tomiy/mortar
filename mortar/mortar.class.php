@@ -9,6 +9,13 @@ use Mortar\Http\Router;
 class Mortar extends Singleton {
 
 	/**
+	 * Includes the routes file
+	 */
+	public static function routes() {
+		require_once CLASS_DIR.'app/routes.php';
+	}
+
+	/**
 	 * Start capturing the output used for debug
 	 */
 	protected function __construct() {

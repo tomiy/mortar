@@ -47,12 +47,6 @@ class Router {
 			'before' => $before
 		];
 	}
-	/**
-	 * Includes the routes file
-	 */
-	public static function routes() {
-		require_once CLASS_DIR.'app/routes.php';
-	}
 
 	/**
 	 * Sets the 404 callback
