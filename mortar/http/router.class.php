@@ -42,6 +42,14 @@ class Router {
 	 * @param mixed  $before the group middleware
 	 */
 	public function __construct($prefix = null, $before = null) {
+		//TODO: csrf protection here
+		// <input type="hidden" name="token" value="<?= hash_hmac('sha256', $uri, $_SESSION['csrf_token']); ? >" />
+
+		// $calc = hash_hmac('sha256', $uri, $_SESSION['csrf_token']);
+		// if (hash_equals($calc, $_POST['token'])) {
+		//     // Continue...
+		// }
+
 		$this->group = [
 			'route' => $prefix,
 			'before' => $before
@@ -122,8 +130,11 @@ class Router {
 		$callback = static::processCallback($callback);
 
 		// check for middleware methods
-		$before = static::processCallback($before);
 		$this->group['before'] = static::processCallback($this->group['before']);
+		if(!is_null($before) && !is_array($before)) $before = [$before];
+		foreach ($before as &$middleware) {
+			$middleware = static::processCallback($middleware);
+		}
 
 		// add route to collection
 		static::$routes[$method][$route] = [
@@ -135,7 +146,11 @@ class Router {
 		if($this->group['before'] != null) {
 			static::$routes[$method][$route]['before'][] = $this->group['before'];
 		}
-		if($before != null) static::$routes[$method][$route]['before'][] = $before;
+		if($before != null) {
+			foreach ($before as $middleware) {
+				static::$routes[$method][$route]['before'][] = $middleware;
+			}
+		}
 	}
 
 	/**
@@ -212,14 +227,6 @@ class Router {
 		$method = (isset($_POST['_method']) && in_array(strtoupper($_POST['_method']), static::$methods))
 			?strtoupper($_POST['_method']):strtoupper($_SERVER['REQUEST_METHOD']);
 
-		//TODO: csrf protection here
-		// <input type="hidden" name="token" value="<?= hash_hmac('sha256', $uri, $_SESSION['csrf_token']); ? >" />
-
-		// $calc = hash_hmac('sha256', '$uri, $_SESSION['csrf_token']);
-		// if (hash_equals($calc, $_POST['token'])) {
-		//     // Continue...
-		// }
-
 		// if static method, callback and bail out
 		if(array_key_exists($static_uri = str_replace('/', '\/', $uri), static::$routes[$method])) {
 			$found = true;
@@ -252,8 +259,7 @@ class Router {
 		// if not found display 404
 		if(!$found) {
 			header($_SERVER["SERVER_PROTOCOL"]." 404 Not Found");
-			//TODO: fix the 404 to behave like other callbacks
-			if(is_callable(static::$notfound)) static::$notfound();
+			call_user_func(static::$notfound);
 			else echo '404 Not Found';
 			exit;
 		}
