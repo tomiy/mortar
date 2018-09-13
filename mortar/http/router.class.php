@@ -130,8 +130,13 @@ class Router {
 		$callback = static::processCallback($callback);
 
 		// check for middleware methods
-		$this->group['before'] = static::processCallback($this->group['before']);
 		if(!is_null($before) && !is_array($before)) $before = [$before];
+		if(!is_null($this->group['before']) && !is_array($this->group['before'])) {
+			$this->group['before'] = [$this->group['before']];
+		}
+		foreach ($this->group['before'] as &$groupmiddleware) {
+			$groupmiddleware = static::processCallback($groupmiddleware);
+		}
 		foreach ($before as &$middleware) {
 			$middleware = static::processCallback($middleware);
 		}
@@ -144,7 +149,9 @@ class Router {
 
 		// add group middleware if we can
 		if($this->group['before'] != null) {
-			static::$routes[$method][$route]['before'][] = $this->group['before'];
+			foreach ($this->group['before'] as $groupmiddleware) {
+				static::$routes[$method][$route]['before'][] = $groupmiddleware;
+			}
 		}
 		if($before != null) {
 			foreach ($before as $middleware) {
