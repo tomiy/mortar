@@ -9,13 +9,13 @@ $router->get('/', function() {
 });
 
 $router->group('/controller/', function($routerGroup) {
-	$routerGroup->get('/', 'App\Controller\TestController@test');
-	$routerGroup->get('/int:key/', 'App\Controller\TestController@key');
+	$routerGroup->get('/', 'App\Controllers\TestController@test');
+	$routerGroup->get('/int:key/', 'App\Controllers\TestController@key');
 
 	$routerGroup->group('/test/', function($secondGroup) {
-		$secondGroup->get('/int:key/', 'App\Controller\TestController@key');
+		$secondGroup->get('/int:key/', 'App\Controllers\TestController@key');
 	});
-}, 'App\Middleware\TestMiddleware');
+}, 'App\Middlewares\TestMiddleware');
 
 $router->get('/int:key/str:test?/', function($key, $test = 'default') {
 	Debug::show("$key/$test");
@@ -24,4 +24,4 @@ $router->get('/int:key/str:test?/', function($key, $test = 'default') {
 
 $router->get('/middleware/', function() {
 	echo '2nd';
-}, 'App\Middleware\TestMiddleware');
+}, 'App\Middlewares\TestMiddleware');
