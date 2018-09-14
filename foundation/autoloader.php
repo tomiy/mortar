@@ -19,3 +19,5 @@ define('CLASS_DIR', relativePath(getcwd(), dirname(__DIR__)).DIRECTORY_SEPARATOR
 set_include_path(get_include_path().PATH_SEPARATOR.CLASS_DIR);
 spl_autoload_extensions('.class.php');
 spl_autoload_register();
+
+require_once __DIR__.DIRECTORY_SEPARATOR.'config.php';
