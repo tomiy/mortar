@@ -29,12 +29,15 @@ class Router {
 		'str' => '[a-zA-Z-]',
 		'all' => '[\w-]'
 	];
+
+	//TODO: doc
+	private static $method;
+
 	/**
 	* The current group prefix + attached middleware
 	* @var array
 	*/
 	private $group;
-
 
 	/**
 	 * Instanciate a new router
@@ -42,13 +45,21 @@ class Router {
 	 * @param mixed  $before the group middleware
 	 */
 	public function __construct($prefix = null, $before = null) {
-		//TODO: csrf protection here
+		//TODO: put csrf in templating parser
 		// <input type="hidden" name="token" value="<?= hash_hmac('sha256', $uri, $_SESSION['csrf_token']); ? >" />
 
-		// $calc = hash_hmac('sha256', $uri, $_SESSION['csrf_token']);
-		// if (hash_equals($calc, $_POST['token'])) {
-		//     // Continue...
-		// }
+		if(empty(static::$method)) {
+			static::$method = (isset($_POST['_method']) && in_array(strtoupper($_POST['_method']), static::$methods))
+				?strtoupper($_POST['_method']):strtoupper($_SERVER['REQUEST_METHOD']);
+		}
+
+		if(static::$method != 'GET') {
+			$calc = hash_hmac('sha256', $uri, $_SESSION['csrf_token']);
+			if (!hash_equals($calc, $_POST['token']) || !in_array(static::$method; static::$methods)) {
+				header($_SERVER["SERVER_PROTOCOL"]." 403 Forbidden");
+				exit;
+			}
+		}
 
 		$this->group = [
 			'route' => $prefix,
@@ -231,19 +242,17 @@ class Router {
 		$found = false;
 		// get uri and method
 		$uri = explode('?', str_replace(dirname($_SERVER['PHP_SELF']), '', $_SERVER['REQUEST_URI']))[0];
-		$method = (isset($_POST['_method']) && in_array(strtoupper($_POST['_method']), static::$methods))
-			?strtoupper($_POST['_method']):strtoupper($_SERVER['REQUEST_METHOD']);
 
 		// if static method, callback and bail out
-		if(array_key_exists($static_uri = str_replace('/', '\/', $uri), static::$routes[$method])) {
+		if(array_key_exists($static_uri = str_replace('/', '\/', $uri), static::$routes[static::$method])) {
 			$found = true;
-			foreach (static::$routes[$method][$static_uri]['before'] as $middleware) {
+			foreach (static::$routes[static::$method][$static_uri]['before'] as $middleware) {
 				call_user_func($middleware);
 			}
-			call_user_func(static::$routes[$method][$static_uri]['callback']);
+			call_user_func(static::$routes[static::$method][$static_uri]['callback']);
 
 		// else try looping through the table and match a regex
-		} else foreach (static::$routes[$method] as $route => $callbacks) {
+	} else foreach (static::$routes[static::$method] as $route => $callbacks) {
 			$callback = $callbacks['callback'];
 			$before = $callbacks['before'];
 			// if match then callback and bail out
