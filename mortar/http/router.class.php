@@ -55,7 +55,7 @@ class Router {
 
 		if(static::$method != 'GET') {
 			$calc = hash_hmac('sha256', $uri, $_SESSION['csrf_token']);
-			if (!hash_equals($calc, $_POST['token']) || !in_array(static::$method; static::$methods)) {
+			if (!hash_equals($calc, $_POST['token']) || !in_array(static::$method, static::$methods)) {
 				header($_SERVER["SERVER_PROTOCOL"]." 403 Forbidden");
 				exit;
 			}
@@ -145,11 +145,15 @@ class Router {
 		if(!is_null($this->group['before']) && !is_array($this->group['before'])) {
 			$this->group['before'] = [$this->group['before']];
 		}
-		foreach ($this->group['before'] as &$groupmiddleware) {
-			$groupmiddleware = static::processCallback($groupmiddleware);
+		if(!is_null($this->group['before'])) {
+			foreach ($this->group['before'] as &$groupmiddleware) {
+				$groupmiddleware = static::processCallback($groupmiddleware);
+			}
 		}
-		foreach ($before as &$middleware) {
-			$middleware = static::processCallback($middleware);
+		if(!is_null($before)) {
+			foreach ($before as &$middleware) {
+				$middleware = static::processCallback($middleware);
+			}
 		}
 
 		// add route to collection
@@ -177,7 +181,7 @@ class Router {
 	 * @param callback $callback the callback of routes
 	 * @param mixed    $before   the group middleware
 	 */
-	private function group($route, $callback, $before = null) {
+	public function group($route, $callback, $before = null) {
 		$route = $this->fixRoute($route);
 		$callback(new self($route, $before));
 	}
@@ -275,8 +279,9 @@ class Router {
 		// if not found display 404
 		if(!$found) {
 			header($_SERVER["SERVER_PROTOCOL"]." 404 Not Found");
-			call_user_func(static::$notfound);
-			else echo '404 Not Found';
+			if(is_callable(static::$notfound)) {
+				call_user_func(static::$notfound);
+			} else echo '404 Not Found';
 			exit;
 		}
 	}
