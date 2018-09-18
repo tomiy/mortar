@@ -1,6 +1,6 @@
 <?php
-use Mortar\Http\Router;
-use Foundation\Tools\Debug;
+use Mortar\Mortar\Http\Router;
+use Mortar\Foundation\Tools\Debug;
 
 $router = new Router();
 

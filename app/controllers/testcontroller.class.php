@@ -1,5 +1,5 @@
 <?php
-namespace App\Controllers;
+namespace Mortar\App\Controllers;
 
 class TestController {
 

@@ -1,5 +1,5 @@
 <?php
-namespace App\Middlewares;
+namespace Mortar\App\Middlewares;
 
 class TestMiddleware {
 

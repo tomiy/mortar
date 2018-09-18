@@ -1,7 +1,7 @@
-<?php require_once '../foundation/autoloader.php';
+<?php require_once '../autoloader.php';
 
-use Mortar\Mortar;
-use Mortar\Http\Router;
+use Mortar\Mortar\Mortar;
+use Mortar\Mortar\Http\Router;
 
 $mortar = Mortar::getInstance();
 

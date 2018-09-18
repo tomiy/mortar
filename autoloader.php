@@ -1,4 +1,4 @@
-<?php
+<?php define('DS', DIRECTORY_SEPARATOR);
 /**
  * Gets the relative path between two paths
  * @param  string $from the source path
@@ -6,18 +6,18 @@
  * @return string       the relative path
  */
 function relativePath($from, $to) {
-	$arFrom = explode(DIRECTORY_SEPARATOR, rtrim($from, DIRECTORY_SEPARATOR));
-	$arTo = explode(DIRECTORY_SEPARATOR, rtrim($to, DIRECTORY_SEPARATOR));
+	$arFrom = explode(DS, rtrim($from, DS));
+	$arTo = explode(DS, rtrim($to, DS));
 	while(count($arFrom) && count($arTo) && ($arFrom[0] == $arTo[0])) {
 		array_shift($arFrom);
 		array_shift($arTo);
 	}
-	return str_pad('', count($arFrom) * 3, '..'.DIRECTORY_SEPARATOR).implode(DIRECTORY_SEPARATOR, $arTo);
+	return str_pad('', count($arFrom) * 3, '..'.DS).implode(DS, $arTo);
 }
 
-define('CLASS_DIR', relativePath(getcwd(), dirname(__DIR__)).DIRECTORY_SEPARATOR);
+define('CLASS_DIR', relativePath(getcwd(), dirname(__DIR__)).DS);
 set_include_path(get_include_path().PATH_SEPARATOR.CLASS_DIR);
 spl_autoload_extensions('.class.php');
 spl_autoload_register();
 
-require_once __DIR__.DIRECTORY_SEPARATOR.'config.php';
+require_once __DIR__.DS.'config.php';
