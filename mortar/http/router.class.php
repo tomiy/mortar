@@ -1,7 +1,7 @@
 <?php
-namespace Mortar\Http;
+namespace Mortar\Mortar\Http;
 
-use Mortar\Mortar;
+use Mortar\Mortar\Mortar;
 
 class Router {
 	/**

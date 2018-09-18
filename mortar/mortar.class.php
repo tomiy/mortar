@@ -1,10 +1,10 @@
 <?php
-namespace Mortar;
+namespace Mortar\Mortar;
 
-use Foundation\Traits\Singleton;
-use Foundation\Tools\Debug;
+use Mortar\Foundation\Traits\Singleton;
+use Mortar\Foundation\Tools\Debug;
 
-use Mortar\Http\Router;
+use Mortar\Mortar\Http\Router;
 
 class Mortar extends Singleton {
 	private $views;

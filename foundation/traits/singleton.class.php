@@ -1,5 +1,5 @@
 <?php
-namespace Foundation\Traits;
+namespace Mortar\Foundation\Traits;
 
 abstract class Singleton {
 

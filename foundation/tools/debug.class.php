@@ -1,5 +1,5 @@
 <?php
-namespace Foundation\Tools;
+namespace Mortar\Foundation\Tools;
 
 abstract class Debug {
 
