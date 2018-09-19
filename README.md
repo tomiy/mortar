@@ -8,9 +8,11 @@ _it's not obligatory but strongly recommended that you put your mortar directory
 ###### _Changes listed in no particular order_
 
 * __V0.1__ _(initial version)_
-	* autoloader
-	* singleton core
-	* http routing
+	* Autoloader
+	* Singleton core
+	* Http routing
 
 * __V0.2__
-	* middleware and controller support
+	* Middleware and controller support
+	* Csrf protection
+	* Customizable settings
