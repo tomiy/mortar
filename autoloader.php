@@ -21,3 +21,4 @@ spl_autoload_extensions('.class.php');
 spl_autoload_register();
 
 require_once __DIR__.DS.'config.php';
+require_once __DIR__.DS.'functions.php';

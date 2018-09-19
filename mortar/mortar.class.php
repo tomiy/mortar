@@ -13,12 +13,11 @@ class Mortar extends Singleton {
 	 * Instanciate the paths with config values
 	 * Start capturing the output used for debug
 	 */
-	//TODO (maybe) a param array to set paths and other shit directly
-	protected function __construct() {
+	protected function __construct($params) {
 		ob_start();
 		$this->views = [
-			'templates' => VIEWS_TEMPLATES,
-			'compiled' => VIEWS_COMPILED
+			'templates' => isset($params['views']['templates'])?$params['views']['templates']:VIEWS_TEMPLATES,
+			'compiled' => isset($params['views']['compiled'])?$params['views']['compiled']:VIEWS_COMPILED
 		];
 	}
 
@@ -35,7 +34,10 @@ class Mortar extends Singleton {
 	}
 
 	private function setViewPath($key, $path) {
-		//TODO: folder checks, relative paths
+		if(!is_dir(path($path))) {
+			echo "Warning, folder $path does not exist.";
+			return;
+		}
 		$this->views[$key] = $path;
 	}
 

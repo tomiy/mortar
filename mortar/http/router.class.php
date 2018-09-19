@@ -30,7 +30,10 @@ class Router {
 		'all' => '[\w-]'
 	];
 
-	//TODO: doc
+	/**
+	 * The method of our request, used to check for csrf
+	 * @var string
+	 */
 	private static $method;
 
 	/**
@@ -244,7 +247,7 @@ class Router {
 	 */
 	public static function dispatch() {
 		$found = false;
-		// get uri and method
+		// get uri
 		$uri = explode('?', str_replace(dirname($_SERVER['PHP_SELF']), '', $_SERVER['REQUEST_URI']))[0];
 
 		// if static method, callback and bail out
