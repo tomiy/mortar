@@ -18,8 +18,8 @@ abstract class Singleton {
 	 * Create the instance if necessary then return it
 	 * @return object the instance
 	 */
-	public static function getInstance() {
-		if(empty(static::$instance)) static::$instance = new static;
+	public static function getInstance($params = null) {
+		if(empty(static::$instance)) static::$instance = new static($params);
 		return static::$instance;
 	}
 }

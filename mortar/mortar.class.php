@@ -13,17 +13,23 @@ class Mortar extends Singleton {
 	 * Instanciate the paths with config values
 	 * Start capturing the output used for debug
 	 */
-	protected function __construct($params) {
+	protected function __construct($params = null) {
 		ob_start();
-		$this->views = [
-			'templates' => isset($params['views']['templates'])?$params['views']['templates']:VIEWS_TEMPLATES,
-			'compiled' => isset($params['views']['compiled'])?$params['views']['compiled']:VIEWS_COMPILED
-		];
+		$this->setTemplatesPath(
+			isset($params['views']['templates'])?
+				$params['views']['templates']:
+				VIEWS_TEMPLATES
+		);
+		$this->setCompiledPath(
+			isset($params['views']['compiled'])?
+				$params['views']['compiled']:
+				VIEWS_COMPILED
+		);
 	}
 
 	//shorthands
-	public function tpl() { return $this->views['templates']; }
-	public function cmp() { return $this->views['compiled']; }
+	public function tplpath() { return $this->views['templates']; }
+	public function cmppath() { return $this->views['compiled']; }
 
 	public function setTemplatesPath($path) {
 		$this->setViewPath('templates', $path);
@@ -34,12 +40,26 @@ class Mortar extends Singleton {
 	}
 
 	private function setViewPath($key, $path) {
-		if(!is_dir(path($path))) {
+		if(!is_dir(realpath($path))) {
 			echo "Warning, folder $path does not exist.";
 			return;
 		}
-		$this->views[$key] = $path;
+		$this->views[$key] = realpath($path).DS;
 	}
+
+	private function compile($tpl) {
+    $tplContents = file_get_contents($tplPath = $this->tplpath().$tpl.VIEWS_EXTENSION);
+		if(
+			!file_exists($cmpPath = $this->cmppath().md5($tpl).".php") ||
+			fgets(fopen($cmpPath, 'r')) != '<?php#'.filemtime($tplPath)."?>\n"
+		) {
+			echo "Compiling $tplPath";
+			//TODO: parse xd
+			//vvv this is just placeholder so that it doesn't compile everytime
+			$tplContents = '<?php#'.filemtime($tplPath)."?>\n".$tplContents;
+			file_put_contents($cmpPath, $tplContents);
+		}
+  }
 
 	/**
 	 * Capture the debug and display the content
@@ -47,11 +67,12 @@ class Mortar extends Singleton {
 	 * @return string         the debug
 	 */
 	public function display($debug = false) {
-    $error_reporting = ob_get_contents();
+    $errorReporting = ob_get_contents();
     ob_end_clean();
 
 		//display
+		$this->compile('testtemplate');
 
-    echo $debug?$error_reporting:null;
+    echo $debug?$errorReporting:null;
   }
 }

@@ -7,3 +7,4 @@ define('APP_DIR', CLASS_DIR.'mortar'.DS.'app'.DS);
 	define('APP_VIEWS', APP_DIR.'views'.DS);
 		define('VIEWS_TEMPLATES', APP_VIEWS.'templates'.DS);
 		define('VIEWS_COMPILED', APP_VIEWS.'compiled'.DS);
+		define('VIEWS_EXTENSION', '.tpl');

@@ -12,7 +12,7 @@ function relativePath($from, $to) {
 		array_shift($arFrom);
 		array_shift($arTo);
 	}
-	return str_pad('', count($arFrom) * 3, '..'.DS).implode(DS, $arTo);
+	return rtrim(str_pad('', count($arFrom) * 3, '..'.DS).implode(DS, $arTo), DS);
 }
 
 define('CLASS_DIR', relativePath(getcwd(), dirname(__DIR__)).DS);
