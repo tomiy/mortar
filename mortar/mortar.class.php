@@ -6,8 +6,13 @@ use Mortar\Foundation\Tools\Debug;
 
 use Mortar\Mortar\Http\Router;
 
+use Mortar\Mortar\Build\Parser;
+
 class Mortar extends Singleton {
 	private $views;
+
+	private $parser;
+	private $variables;
 
 	/**
 	 * Instanciate the paths with config values
@@ -25,6 +30,8 @@ class Mortar extends Singleton {
 				$params['views']['compiled']:
 				VIEWS_COMPILED
 		);
+
+		$this->variables = [];
 	}
 
 	//shorthands
@@ -53,11 +60,8 @@ class Mortar extends Singleton {
 			!file_exists($cmpPath = $this->cmppath().md5($tpl).".php") ||
 			fgets(fopen($cmpPath, 'r')) != '<?php#'.filemtime($tplPath)."?>\n"
 		) {
-			echo "Compiling $tplPath";
-			//TODO: parse xd
-			//vvv this is just placeholder so that it doesn't compile everytime
-			$tplContents = '<?php#'.filemtime($tplPath)."?>\n".$tplContents;
-			file_put_contents($cmpPath, $tplContents);
+			$compiled = $this->parser->parse($tplContents, filemtime($tplPath));
+			file_put_contents($cmpPath, $compiled);
 		}
   }
 
@@ -69,6 +73,8 @@ class Mortar extends Singleton {
 	public function display($debug = false) {
     $errorReporting = ob_get_contents();
     ob_end_clean();
+
+		$this->parser = new Parser($this->variables);
 
 		//display
 		$this->compile('testtemplate');
