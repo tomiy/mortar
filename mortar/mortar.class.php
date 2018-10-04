@@ -74,7 +74,7 @@ class Mortar extends Singleton {
     $errorReporting = ob_get_contents();
     ob_end_clean();
 
-		$this->parser = new Parser($this->variables);
+		$this->parser = Parser::getInstance($this->variables);
 
 		//display
 		$this->compile('testtemplate');
