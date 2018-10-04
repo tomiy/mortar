@@ -1,6 +1,8 @@
 <?php
 namespace Mortar\Mortar\Build;
 
+use Mortar\Foundation\Traits\Singleton;
+
 class Parser extends Singleton {
 
 	private $variables;
