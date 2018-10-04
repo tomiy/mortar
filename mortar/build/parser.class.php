@@ -23,4 +23,8 @@ class Parser extends Singleton {
 
 		return "<?php#$stamp?>\n$parsed";
 	}
+
+	private function csrf() {
+		return '<input type="hidden" name="token" value="<?= hash_hmac(\'sha256\', CURRENT_URI, $_SESSION['csrf_token']); ? >"/>';
+	}
 }

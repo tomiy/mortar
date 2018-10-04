@@ -48,8 +48,6 @@ class Router {
 	 * @param mixed  $before the group middleware
 	 */
 	public function __construct($prefix = null, $before = null) {
-		//TODO: put csrf in templating parser
-		// <input type="hidden" name="token" value="<?= hash_hmac('sha256', $uri, $_SESSION['csrf_token']); ? >" />
 
 		if(empty(static::$method)) {
 			static::$method = (isset($_POST['_method']) && in_array(strtoupper($_POST['_method']), static::$methods))
@@ -57,7 +55,7 @@ class Router {
 		}
 
 		if(static::$method != 'GET') {
-			$calc = hash_hmac('sha256', $uri, $_SESSION['csrf_token']);
+			$calc = hash_hmac('sha256', CURRENT_URI, $_SESSION['csrf_token']);
 			if (!hash_equals($calc, $_POST['token']) || !in_array(static::$method, static::$methods)) {
 				header($_SERVER["SERVER_PROTOCOL"]." 403 Forbidden");
 				exit;
@@ -247,11 +245,9 @@ class Router {
 	 */
 	public static function dispatch() {
 		$found = false;
-		// get uri
-		$uri = explode('?', str_replace(dirname($_SERVER['PHP_SELF']), '', $_SERVER['REQUEST_URI']))[0];
 
 		// if static method, callback and bail out
-		if(array_key_exists($static_uri = str_replace('/', '\/', $uri), static::$routes[static::$method])) {
+		if(array_key_exists($static_uri = str_replace('/', '\/', CURRENT_URI), static::$routes[static::$method])) {
 			$found = true;
 			foreach (static::$routes[static::$method][$static_uri]['before'] as $middleware) {
 				call_user_func($middleware);
@@ -263,7 +259,7 @@ class Router {
 			$callback = $callbacks['callback'];
 			$before = $callbacks['before'];
 			// if match then callback and bail out
-			if(preg_match("/^$route$/", $uri, $arguments)) {
+			if(preg_match("/^$route$/", CURRENT_URI, $arguments)) {
 				$found = true;
 				// remove non custom matches
 				$arguments = array_filter($arguments, function($key) {
