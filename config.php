@@ -13,3 +13,4 @@ define('APP_DIR', CLASS_DIR.'mortar'.DS.'app'.DS);
 
 define('PARSER_OPEN', '<-');
 define('PARSER_STOP', '->');
+define('PARSER_MASK', count_chars(PARSER_OPEN.PARSER_STOP, 3));

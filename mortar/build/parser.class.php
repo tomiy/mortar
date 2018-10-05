@@ -12,13 +12,14 @@ class Parser extends Singleton {
 	}
 
 	public function parse($template, $stamp = null) {
-		$parsed = preg_replace_callback('/'.PARSER_OPEN.'(.*)'.PARSER_STOP.'/sm', function($matches) {
-			$params = explode('|', $matches[1]);
+		$regex = '/('.PARSER_OPEN.'((?>[^'.PARSER_MASK.']|(?1))*)'.PARSER_STOP.')/sm';
+		$parsed = preg_replace_callback($regex, function($matches) {
+			$params = explode('|', $matches[2]);
 			$callback = array_shift($params);
 
 			if(is_callable([$this, $callback])) {
 				return $this->$callback(...$params);
-			} else return $matches[0];
+			} else return htmlspecialchars($matches[1]);
 		}, $template);
 
 		return (is_null($stamp)?'':"<?php#$stamp?>\n").$parsed;
