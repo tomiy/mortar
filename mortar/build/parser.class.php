@@ -16,7 +16,7 @@ class Parser extends Singleton {
 			$params = explode('|', $matches[1]);
 			$callback = array_shift($params);
 
-			if(is_callable($callback)) {
+			if(is_callable([$this, $callback])) {
 				return $this->$callback(...$params);
 			} else return $matches[0];
 		}, $template);
@@ -25,6 +25,6 @@ class Parser extends Singleton {
 	}
 
 	private function csrf() {
-		return '<input type="hidden" name="token" value="<?= hash_hmac(\'sha256\', CURRENT_URI, $_SESSION['csrf_token']); ? >"/>';
+		return '<input type="hidden" name="token" value="<?= hash_hmac(\'sha256\', CURRENT_URI, $_SESSION[\'csrf_token\']); ?>"/>';
 	}
 }
