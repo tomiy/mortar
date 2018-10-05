@@ -12,7 +12,7 @@ class Parser extends Singleton {
 	}
 
 	public function parse($template, $stamp = null) {
-		$parsed = preg_replace_callback('/<!(.*)!>/m', function($matches) {
+		$parsed = preg_replace_callback('/'.PARSER_OPEN.'(.*)'.PARSER_STOP.'/sm', function($matches) {
 			$params = explode('|', $matches[1]);
 			$callback = array_shift($params);
 
@@ -21,10 +21,26 @@ class Parser extends Singleton {
 			} else return $matches[0];
 		}, $template);
 
-		return "<?php#$stamp?>\n$parsed";
+		return (is_null($stamp)?'':"<?php#$stamp?>\n").$parsed;
+	}
+
+	private function var($var) {
+		return $this->variables[$var];
+	}
+
+	private function loop($counter, $content) {
+		$counter = $this->parse($counter);
+		$content = $this->parse($content);
+		$output = '';
+
+		for ($i = 0; $i < $counter; $i++) {
+			$output .= $content;
+		}
+
+		return $output;
 	}
 
 	private function csrf() {
-		return '<input type="hidden" name="token" value="<?= hash_hmac(\'sha256\', CURRENT_URI, $_SESSION[\'csrf_token\']); ?>"/>';
+		return '<input type="hidden" name="_token" value="<?= hash_hmac(\'sha256\', CURRENT_URI, $_SESSION[\'csrf_token\']); ?>"/>';
 	}
 }

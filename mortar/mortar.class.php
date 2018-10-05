@@ -55,7 +55,7 @@ class Mortar extends Singleton {
 	}
 
 	private function compile($tpl) {
-    $tplContents = file_get_contents($tplPath = $this->tplpath().$tpl.VIEWS_EXTENSION);
+		$tplContents = file_get_contents($tplPath = $this->tplpath().$tpl.VIEWS_EXTENSION);
 		if(
 			!file_exists($cmpPath = $this->cmppath().md5($tpl).".php") ||
 			fgets(fopen($cmpPath, 'r')) != '<?php#'.filemtime($tplPath)."?>\n"
@@ -63,7 +63,7 @@ class Mortar extends Singleton {
 			$compiled = $this->parser->parse($tplContents, filemtime($tplPath));
 			file_put_contents($cmpPath, $compiled);
 		}
-  }
+	}
 
 	/**
 	 * Capture the debug and display the content
@@ -71,14 +71,14 @@ class Mortar extends Singleton {
 	 * @return string         the debug
 	 */
 	public function display($debug = false) {
-    $errorReporting = ob_get_contents();
-    ob_end_clean();
+		$errorReporting = ob_get_contents();
+		ob_end_clean();
 
 		$this->parser = Parser::getInstance($this->variables);
 
 		//display
 		$this->compile('testtemplate');
 
-    echo $debug?$errorReporting:null;
-  }
+		echo $debug?$errorReporting:null;
+	}
 }

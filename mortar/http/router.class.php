@@ -56,7 +56,7 @@ class Router {
 
 		if(static::$method != 'GET') {
 			$calc = hash_hmac('sha256', CURRENT_URI, $_SESSION['csrf_token']);
-			if (!hash_equals($calc, $_POST['token']) || !in_array(static::$method, static::$methods)) {
+			if (!hash_equals($calc, $_POST['_token']) || !in_array(static::$method, static::$methods)) {
 				header($_SERVER["SERVER_PROTOCOL"]." 403 Forbidden");
 				exit;
 			}
