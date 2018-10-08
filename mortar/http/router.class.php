@@ -72,7 +72,7 @@ class Router {
 	 * Sets the 404 callback
 	 * @var callback
 	 */
-	private static function notFound($callback) {
+	public static function notFound($callback) {
 		static::$notfound = $callback;
 	}
 

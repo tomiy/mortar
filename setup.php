@@ -15,6 +15,10 @@ function relativePath($from, $to) {
 	return rtrim(str_pad('', count($arFrom) * 3, '..'.DS).implode(DS, $arTo), DS);
 }
 
+function escape($string) {
+	return htmlentities(mb_convert_encoding($string, 'UTF-8', 'UTF-8'), ENT_QUOTES, 'UTF-8');
+}
+
 define('CLASS_DIR', relativePath(getcwd(), dirname(__DIR__)).DS);
 set_include_path(get_include_path().PATH_SEPARATOR.CLASS_DIR);
 spl_autoload_extensions('.class.php');

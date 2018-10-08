@@ -7,7 +7,7 @@ class Parser extends Singleton {
 
 	private $variables;
 
-	protected function __construct($variables) {
+	public function loadVariables($variables) {
 		$this->variables = $variables;
 	}
 
@@ -26,7 +26,7 @@ class Parser extends Singleton {
 	}
 
 	private function var($var) {
-		return $this->variables[$var];
+		return '<?=escape($this->variables[$var])?>';
 	}
 
 	private function loop($counter, $content) {

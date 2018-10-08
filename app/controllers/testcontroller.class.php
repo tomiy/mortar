@@ -8,7 +8,7 @@ class TestController {
 	}
 
 	public function key($key) {
-		echo "key: $key";
+		echo escape("key: $key");
 	}
 
 }

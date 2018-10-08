@@ -31,6 +31,7 @@ class Mortar extends Singleton {
 				VIEWS_COMPILED
 		);
 
+		$this->parser = Parser::getInstance();
 		$this->variables = [];
 	}
 
@@ -48,7 +49,7 @@ class Mortar extends Singleton {
 
 	private function setViewPath($key, $path) {
 		if(!is_dir(realpath($path))) {
-			echo "Warning, folder $path does not exist.";
+			echo escape("Warning, folder $path does not exist.");
 			return;
 		}
 		$this->views[$key] = realpath($path).DS;
@@ -74,7 +75,7 @@ class Mortar extends Singleton {
 		$errorReporting = ob_get_contents();
 		ob_end_clean();
 
-		$this->parser = Parser::getInstance($this->variables);
+		$this->parser->loadVariables($this->variables);
 
 		//display
 		$this->compile('testtemplate');
