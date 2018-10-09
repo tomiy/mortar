@@ -1,4 +1,4 @@
-<?php require_once '../autoloader.php';
+<?php require_once '../setup.php';
 
 use Mortar\Mortar\Mortar;
 use Mortar\Mortar\Http\Router;

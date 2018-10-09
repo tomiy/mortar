@@ -6,24 +6,39 @@ use Mortar\Foundation\Tools\Debug;
 
 use Mortar\Mortar\Http\Router;
 
+use Mortar\Mortar\Build\Parser;
+
 class Mortar extends Singleton {
 	private $views;
+
+	private $parser;
+	private $template;
+	private $variables;
 
 	/**
 	 * Instanciate the paths with config values
 	 * Start capturing the output used for debug
 	 */
-	protected function __construct($params) {
+	protected function __construct($params = null) {
 		ob_start();
-		$this->views = [
-			'templates' => isset($params['views']['templates'])?$params['views']['templates']:VIEWS_TEMPLATES,
-			'compiled' => isset($params['views']['compiled'])?$params['views']['compiled']:VIEWS_COMPILED
-		];
+		$this->setTemplatesPath(
+			isset($params['views']['templates'])?
+				$params['views']['templates']:
+				VIEWS_TEMPLATES
+		);
+		$this->setCompiledPath(
+			isset($params['views']['compiled'])?
+				$params['views']['compiled']:
+				VIEWS_COMPILED
+		);
+
+		$this->parser = new Parser();
+		$this->variables = [];
 	}
 
 	//shorthands
-	public function tpl() { return $this->views['templates']; }
-	public function cmp() { return $this->views['compiled']; }
+	public function tplpath() { return $this->views['templates']; }
+	public function cmppath() { return $this->views['compiled']; }
 
 	public function setTemplatesPath($path) {
 		$this->setViewPath('templates', $path);
@@ -34,11 +49,34 @@ class Mortar extends Singleton {
 	}
 
 	private function setViewPath($key, $path) {
-		if(!is_dir(path($path))) {
-			echo "Warning, folder $path does not exist.";
+		if(!is_dir(realpath($path))) {
+			echo escape("Warning, folder $path does not exist.");
 			return;
 		}
-		$this->views[$key] = $path;
+		$this->views[$key] = realpath($path).DS;
+	}
+
+	public function assign($arguments) {
+		foreach($arguments as $name => $value) {
+			$this->variables[$name] = $value;
+		}
+	}
+
+	public function view($name) {
+		$this->template = $name;
+	}
+
+	private function compile($tpl) {
+		$tplContents = file_get_contents($tplPath = $this->tplpath().$tpl.VIEWS_EXTENSION);
+		if(
+			!file_exists($cmpPath = $this->cmppath().md5($tpl).".php") ||
+			fgets(fopen($cmpPath, 'r')) != '<?php#'.filemtime($tplPath)."?>\n"
+		) {
+			$compiled = $this->parser->parse($tplContents, filemtime($tplPath));
+			file_put_contents($cmpPath, $compiled);
+		}
+
+		return $cmpPath;
 	}
 
 	/**
@@ -47,11 +85,15 @@ class Mortar extends Singleton {
 	 * @return string         the debug
 	 */
 	public function display($debug = false) {
-    $error_reporting = ob_get_contents();
-    ob_end_clean();
+		$errorReporting = ob_get_contents();
+		ob_end_clean();
+
+		$this->parser->loadVariables($this->variables);
 
 		//display
+		$compiled = $this->compile($this->template);
+		include $compiled;
 
-    echo $debug?$error_reporting:null;
-  }
+		echo $debug?$errorReporting:null;
+	}
 }
