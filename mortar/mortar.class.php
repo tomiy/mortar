@@ -12,6 +12,7 @@ class Mortar extends Singleton {
 	private $views;
 
 	private $parser;
+	private $template;
 	private $variables;
 
 	/**
@@ -31,7 +32,7 @@ class Mortar extends Singleton {
 				VIEWS_COMPILED
 		);
 
-		$this->parser = Parser::getInstance();
+		$this->parser = new Parser();
 		$this->variables = [];
 	}
 
@@ -55,6 +56,16 @@ class Mortar extends Singleton {
 		$this->views[$key] = realpath($path).DS;
 	}
 
+	public function assign($arguments) {
+		foreach($arguments as $name => $value) {
+			$this->variables[$name] = $value;
+		}
+	}
+
+	public function view($name) {
+		$this->template = $name;
+	}
+
 	private function compile($tpl) {
 		$tplContents = file_get_contents($tplPath = $this->tplpath().$tpl.VIEWS_EXTENSION);
 		if(
@@ -64,6 +75,8 @@ class Mortar extends Singleton {
 			$compiled = $this->parser->parse($tplContents, filemtime($tplPath));
 			file_put_contents($cmpPath, $compiled);
 		}
+
+		return $cmpPath;
 	}
 
 	/**
@@ -78,7 +91,8 @@ class Mortar extends Singleton {
 		$this->parser->loadVariables($this->variables);
 
 		//display
-		$this->compile('testtemplate');
+		$compiled = $this->compile($this->template);
+		include $compiled;
 
 		echo $debug?$errorReporting:null;
 	}

@@ -1,11 +1,16 @@
 <?php
 namespace Mortar\Mortar\Build;
 
-use Mortar\Foundation\Traits\Singleton;
+use Mortar\Mortar\Mortar;
 
-class Parser extends Singleton {
+class Parser {
 
+	private $mortar;
 	private $variables;
+
+	public function __construct() {
+		$this->mortar = Mortar::getInstance();
+	}
 
 	public function loadVariables($variables) {
 		$this->variables = $variables;
@@ -26,7 +31,7 @@ class Parser extends Singleton {
 	}
 
 	private function var($var) {
-		return '<?=escape($this->variables[$var])?>';
+		return '<?=escape($this->variables[\''.$var.'\'])?>';
 	}
 
 	private function loop($counter, $content) {
@@ -39,6 +44,11 @@ class Parser extends Singleton {
 		}
 
 		return $output;
+	}
+
+	private function template($name) {
+		$cmpPath = $this->mortar->compile($name);
+		return "<? include $cmpPath ?>";
 	}
 
 	private function csrf() {
