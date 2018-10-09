@@ -48,7 +48,6 @@ class Router {
 	 * @param mixed  $before the group middleware
 	 */
 	public function __construct($prefix = null, $before = null) {
-
 		if(empty(static::$method)) {
 			static::$method = (isset($_POST['_method']) && in_array(strtoupper($_POST['_method']), static::$methods))
 				?strtoupper($_POST['_method']):strtoupper($_SERVER['REQUEST_METHOD']);
