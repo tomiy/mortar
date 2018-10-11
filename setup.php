@@ -1,13 +1,13 @@
 <?php define('DS', DIRECTORY_SEPARATOR);
 /**
  * Gets the relative path between two paths
- * @param  string $from the source path
- * @param  string $to   the destination path
- * @return string       the relative path
+ * @param  string $source the source path
+ * @param  string $destin the destination path
+ * @return string         the relative path
  */
-function relativePath($from, $to) {
-	$arFrom = explode(DS, rtrim($from, DS));
-	$arTo = explode(DS, rtrim($to, DS));
+function relativePath($source, $destin) {
+	$arFrom = explode(DS, rtrim($source, DS));
+	$arTo = explode(DS, rtrim($destin, DS));
 	while(count($arFrom) && count($arTo) && ($arFrom[0] == $arTo[0])) {
 		array_shift($arFrom);
 		array_shift($arTo);
