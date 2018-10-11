@@ -10,10 +10,14 @@ class Router {
 	 * @var array
 	 */
 	private static $routes = [];
-
+	private static $request;
 
 	private $worker;
 	private $response;
+
+	public static function loadRequest($request) {
+		static::$request = $request;
+	}
 
 	/**
 	 * Instanciate a new router
@@ -21,7 +25,9 @@ class Router {
 	 * @param mixed  $before the group middleware
 	 */
 	public function __construct($response = null, $prefix = null, $before = null) {
-		$this->response = $response?$response:new RouteResponse($_POST['_method'], $_POST['_token']);
+		if(!static::$request) throw new \Exception("No request object", 1);
+
+		$this->response = $response?$response:new RouteResponse(static::$request);
 		$this->worker = new RouteWorker($prefix, $before);
 	}
 
