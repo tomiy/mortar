@@ -10,57 +10,19 @@ class Router {
 	 * @var array
 	 */
 	private static $routes = [];
-	/**
-	 * The 404 callback
-	 * @var callback
-	 */
-	private static $notfound;
 
-	/**
-	 * The allowed methods (used to check for forced method via $_POST)
-	 * @var array
-	 */
-	private static $methods = ['GET', 'POST', 'PUT', 'DELETE'];
-
-	/**
-	 * The method of our request, used to check for csrf
-	 * @var string
-	 */
-	private static $method;
-
-	/**
-	* The current group prefix + attached middleware
-	* @var array
-	*/
-	private $group;
 
 	private $worker;
+	private $response;
 
 	/**
 	 * Instanciate a new router
 	 * @param string $prefix the route group
 	 * @param mixed  $before the group middleware
 	 */
-	public function __construct($prefix = null, $before = null) {
-		if(empty(static::$method)) {
-			static::$method = (isset($_POST['_method']) && in_array(strtoupper($_POST['_method']), static::$methods))
-				?strtoupper($_POST['_method']):strtoupper($_SERVER['REQUEST_METHOD']);
-		}
-
-		if(static::$method != 'GET') {
-			$calc = hash_hmac('sha256', CURRENT_URI, $_SESSION['csrf_token']);
-			if (!hash_equals($calc, $_POST['_token']) || !in_array(static::$method, static::$methods)) {
-				header($_SERVER["SERVER_PROTOCOL"]." 403 Forbidden");
-				exit;
-			}
-		}
-
-		$this->worker = new RouteWorker();
-
-		$this->group = [
-			'route' => $prefix,
-			'before' => $before
-		];
+	public function __construct($response = null, $prefix = null, $before = null) {
+		$this->response = $response?$response:new RouteResponse($_POST['_method'], $_POST['_token']);
+		$this->worker = new RouteWorker($prefix, $before);
 	}
 
 	/**
@@ -68,7 +30,7 @@ class Router {
 	 * @var callback
 	 */
 	public static function setNotFound($callback) {
-		static::$notfound = $callback;
+		$this->response->setNotFound($callback);
 	}
 
 	/**
@@ -108,16 +70,6 @@ class Router {
 		$this->addRoute('DELETE', $route, $callback, $before);
 	}
 
-	private function fixRoute($route) {
-		// force slashes on both sides
-		$route = '/'.trim($route,'/').($route=='/'?'':'/');
-		// prepend group route if we can
-		if($this->group['route'] != null) {
-			$route = rtrim($this->group['route'], '/').$route;
-		}
-		return $route;
-	}
-
 	/**
 	 * Adds a parsed route to the collection with its callback and middleware(s)
 	 * @param string $method   the method that should match this route
@@ -126,7 +78,7 @@ class Router {
 	 * @param mixed  $before   the middleware called before if the route is matched
 	 */
 	private function addRoute($method, $route, $callback, $before) {
-		$route = $this->fixRoute($route);
+		$route = $this->worker->fixRoute($route);
 
 		// if dynamic route, parse, else just make it regex friendly
 		if(strpos($route, ':')) {
@@ -137,20 +89,7 @@ class Router {
 		$callback = $this->worker->processCallback($callback);
 
 		// check for middleware methods
-		if(!is_null($before) && !is_array($before)) $before = [$before];
-		if(!is_null($this->group['before']) && !is_array($this->group['before'])) {
-			$this->group['before'] = [$this->group['before']];
-		}
-		if(!is_null($this->group['before'])) {
-			foreach ($this->group['before'] as &$groupmiddleware) {
-				$groupmiddleware = $this->worker->processCallback($groupmiddleware);
-			}
-		}
-		if(!is_null($before)) {
-			foreach ($before as &$middleware) {
-				$middleware = $this->worker->processCallback($middleware);
-			}
-		}
+		$before = $this->worker->processMiddlewares($before);
 
 		// add route to collection
 		static::$routes[$method][$route] = [
@@ -159,16 +98,7 @@ class Router {
 		];
 
 		// add group middleware if we can
-		if($this->group['before'] != null) {
-			foreach ($this->group['before'] as $groupmiddleware) {
-				static::$routes[$method][$route]['before'][] = $groupmiddleware;
-			}
-		}
-		if($before != null) {
-			foreach ($before as $middleware) {
-				static::$routes[$method][$route]['before'][] = $middleware;
-			}
-		}
+		static::$routes[$method][$route]['before'] = $this->worker->addMiddlewares($before);
 	}
 
 	/**
@@ -178,8 +108,8 @@ class Router {
 	 * @param mixed    $before   the group middleware
 	 */
 	public function group($route, $callback, $before = null) {
-		$route = $this->fixRoute($route);
-		$callback(new self($route, $before));
+		$route = $this->worker->fixRoute($route);
+		$callback(new self($this->response, $route, $before));
 	}
 
 	/**
@@ -189,15 +119,18 @@ class Router {
 		$found = false;
 
 		// if static method, callback and bail out
-		if(array_key_exists($static_uri = str_replace('/', '\/', CURRENT_URI), static::$routes[static::$method])) {
+		if(array_key_exists(
+			$static_uri = str_replace('/', '\/', CURRENT_URI),
+			static::$routes[$this->reponse->getMethod()])
+		) {
 			$found = true;
-			foreach (static::$routes[static::$method][$static_uri]['before'] as $middleware) {
+			foreach (static::$routes[$this->reponse->getMethod()][$static_uri]['before'] as $middleware) {
 				call_user_func($middleware);
 			}
-			call_user_func(static::$routes[static::$method][$static_uri]['callback']);
+			call_user_func(static::$routes[$this->reponse->getMethod()][$static_uri]['callback']);
 
 		// else try looping through the table and match a regex
-		} else foreach (static::$routes[static::$method] as $route => $callbacks) {
+	} else foreach (static::$routes[$this->reponse->getMethod()] as $route => $callbacks) {
 			$callback = $callbacks['callback'];
 			$before = $callbacks['before'];
 			// if match then callback and bail out
@@ -219,11 +152,7 @@ class Router {
 
 		// if not found display 404
 		if(!$found) {
-			header($_SERVER["SERVER_PROTOCOL"]." 404 Not Found");
-			if(is_callable(static::$notfound)) {
-				call_user_func(static::$notfound);
-			} else echo '404 Not Found';
-			exit;
+			$this->response->notFound();
 		}
 	}
 }

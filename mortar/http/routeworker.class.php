@@ -13,6 +13,59 @@ class RouteWorker {
 		'all' => '[\w-]'
 	];
 
+	private $prefix;
+	private $before;
+
+	public function __construct($prefix, $before) {
+		$this->prefix = $prefix;
+		$this->before = $this->processMiddlewares($before);
+	}
+
+	public function getPrefix() {
+		return $this->prefix;
+	}
+
+	public function getBefore() {
+		return $this->before;
+	}
+
+	public function processMiddlewares($before) {
+		if(!is_null($before)) {
+			if(!is_array($before)) $before = [$before];
+			foreach ($before as &$groupmiddleware) {
+				$groupmiddleware = $this->processCallback($groupmiddleware);
+			}
+		}
+
+		return $before;
+	}
+
+	public function addMiddlewares($before) {
+		$output = [];
+		if($this->before != null) {
+			foreach ($this->before as $groupmiddleware) {
+				$output[] = $groupmiddleware;
+			}
+		}
+		if($before != null) {
+			foreach ($before as $middleware) {
+				$output[] = $middleware;
+			}
+		}
+
+		return $output;
+	}
+
+	public function fixRoute($route) {
+		// force slashes on both sides
+		$route = '/'.trim($route,'/').($route=='/'?'':'/');
+		// prepend group route if we can
+		if($this->prefix != null) {
+			$route = rtrim($this->prefix, '/').$route;
+		}
+		return $route;
+	}
+
 	/**
 	 * Parses the route into a nice, matchable regex
 	 * @param  string $route the route we want to parse
