@@ -34,7 +34,7 @@ class RouteResponse {
 		$calc = hash_hmac('sha256', CURRENT_URI, $this->request->session['csrf_token']);
 		if (!hash_equals($calc, $token) || !in_array($this->method, static::$methods)) {
 			header($this->request->server["SERVER_PROTOCOL"]." 403 Forbidden");
-			exit;
+			stop();
 		}
 	}
 
