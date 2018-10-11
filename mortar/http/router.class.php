@@ -11,9 +11,9 @@ class Router {
 	 */
 	private static $routes = [];
 	private static $request;
+	private static $response;
 
 	private $worker;
-	private $response;
 
 	public static function loadRequest($request) {
 		static::$request = $request;
@@ -24,10 +24,10 @@ class Router {
 	 * @param string $prefix the route group
 	 * @param mixed  $before the group middleware
 	 */
-	public function __construct($response = null, $prefix = null, $before = null) {
+	public function __construct($prefix = null, $before = null) {
 		if(!static::$request) throw new \Exception("No request object", 1);
 
-		$this->response = $response?$response:new RouteResponse(static::$request);
+		if(!static::$response) static::$response = new RouteResponse(static::$request);
 		$this->worker = new RouteWorker($prefix, $before);
 	}
 
@@ -36,7 +36,7 @@ class Router {
 	 * @var callback
 	 */
 	public static function setNotFound($callback) {
-		$this->response->setNotFound($callback);
+		static::$response->setNotFound($callback);
 	}
 
 	/**
@@ -115,7 +115,7 @@ class Router {
 	 */
 	public function group($route, $callback, $before = null) {
 		$route = $this->worker->fixRoute($route);
-		$callback(new self($this->response, $route, $before));
+		$callback(new self($route, $before));
 	}
 
 	/**
@@ -127,16 +127,16 @@ class Router {
 		// if static method, callback and bail out
 		if(array_key_exists(
 			$static_uri = str_replace('/', '\/', CURRENT_URI),
-			static::$routes[$this->reponse->getMethod()])
+			static::$routes[static::$response->getMethod()])
 		) {
 			$found = true;
-			foreach (static::$routes[$this->reponse->getMethod()][$static_uri]['before'] as $middleware) {
+			foreach (static::$routes[static::$response->getMethod()][$static_uri]['before'] as $middleware) {
 				call_user_func($middleware);
 			}
-			call_user_func(static::$routes[$this->reponse->getMethod()][$static_uri]['callback']);
+			call_user_func(static::$routes[static::$response->getMethod()][$static_uri]['callback']);
 
 		// else try looping through the table and match a regex
-	} else foreach (static::$routes[$this->reponse->getMethod()] as $route => $callbacks) {
+	} else foreach (static::$routes[static::$response->getMethod()] as $route => $callbacks) {
 			$callback = $callbacks['callback'];
 			$before = $callbacks['before'];
 			// if match then callback and bail out
@@ -158,7 +158,7 @@ class Router {
 
 		// if not found display 404
 		if(!$found) {
-			$this->response->notFound();
+			static::$response->notFound();
 		}
 	}
 }
