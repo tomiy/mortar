@@ -8,8 +8,8 @@ class Parser {
 	private $mortar;
 	private $variables;
 
-	public function __construct() {
-		$this->mortar = Mortar::getInstance();
+	public function __construct($mortar) {
+		$this->mortar = $mortar;
 	}
 
 	public function loadVariables($variables) {
