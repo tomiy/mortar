@@ -19,8 +19,6 @@ function escape($string) {
 	return htmlentities(mb_convert_encoding($string, 'UTF-8', 'UTF-8'), ENT_QUOTES, 'UTF-8');
 }
 
-function stop() { exit; }
-
 define('CLASS_DIR', relativePath(getcwd(), dirname(__DIR__)).DS);
 set_include_path(get_include_path().PATH_SEPARATOR.CLASS_DIR);
 spl_autoload_extensions('.class.php');

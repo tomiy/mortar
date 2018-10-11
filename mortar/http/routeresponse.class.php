@@ -27,14 +27,13 @@ class RouteResponse {
 		$this->method = in_array(strtoupper($request->post['_method']), static::$methods)
 			?strtoupper($request->post['_method']):strtoupper($request->server['REQUEST_METHOD']);
 
-		if($this->method != 'GET') $this->checkCSRF($token);
+		if($this->method != 'GET') $this->checkCSRF($request->post['_token']);
 	}
 
 	public function checkCSRF($token) {
 		$calc = hash_hmac('sha256', CURRENT_URI, $this->request->session['csrf_token']);
 		if (!hash_equals($calc, $token) || !in_array($this->method, static::$methods)) {
 			header($this->request->server["SERVER_PROTOCOL"]." 403 Forbidden");
-			stop();
 		}
 	}
 
@@ -43,6 +42,5 @@ class RouteResponse {
 		if(is_callable($this->notfound)) {
 			call_user_func($this->notfound);
 		} else echo '404 Not Found';
-		exit;
 	}
 }
