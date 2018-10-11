@@ -32,7 +32,7 @@ class Mortar extends Singleton {
 				VIEWS_COMPILED
 		);
 
-		$this->parser = new Parser();
+		$this->parser = new Parser($this);
 		$this->variables = [];
 	}
 
