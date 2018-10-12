@@ -13,6 +13,7 @@ class Router {
 	private static $request;
 	private static $response;
 
+	private $mortar;
 	private $worker;
 
 	public static function loadRequest($request) {
@@ -24,11 +25,12 @@ class Router {
 	 * @param string $prefix the route group
 	 * @param mixed  $before the group middleware
 	 */
-	public function __construct($prefix = null, $before = null) {
+	public function __construct($mortar, $prefix = null, $before = null) {
 		if(!static::$request) throw new \Exception("No request object", 1);
 
 		if(!static::$response) static::$response = new RouteResponse(static::$request);
-		$this->worker = new RouteWorker($prefix, $before);
+		$this->mortar = $mortar;
+		$this->worker = new RouteWorker($mortar, $prefix, $before);
 	}
 
 	/**
@@ -115,7 +117,7 @@ class Router {
 	 */
 	public function group($route, $callback, $before = null) {
 		$route = $this->worker->fixRoute($route);
-		$callback(new self($route, $before));
+		$callback(new self($this->mortar, $route, $before));
 	}
 
 	/**
