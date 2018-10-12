@@ -6,10 +6,12 @@ use Mortar\Mortar\Mortar;
 class Parser {
 
 	private $mortar;
+	private $worker;
 	private $variables;
 
 	public function __construct($mortar) {
 		$this->mortar = $mortar;
+		$this->worker = new ParserWorker($this, $mortar);
 	}
 
 	public function loadVariables($variables) {
@@ -22,36 +24,11 @@ class Parser {
 			$params = explode('|', $matches[2]);
 			$callback = array_shift($params);
 
-			if(is_callable([$this, $callback])) {
-				return $this->$callback(...$params);
+			if(is_callable([$this->worker, $callback])) {
+				return $this->worker->$callback(...$params);
 			} else return htmlspecialchars($matches[1]);
 		}, $template);
 
 		return (is_null($stamp)?'':"<?php#$stamp?>\n").$parsed;
-	}
-
-	private function var($var) {
-		return '<?=escape($this->variables[\''.$var.'\'])?>';
-	}
-
-	private function loop($counter, $content) {
-		$counter = $this->parse($counter);
-		$content = $this->parse($content);
-		$output = '';
-
-		for ($i = 0; $i < $counter; $i++) {
-			$output .= $content;
-		}
-
-		return $output;
-	}
-
-	private function template($name) {
-		$cmpPath = $this->mortar->compile($name);
-		return "<? include $cmpPath ?>";
-	}
-
-	private function csrf() {
-		return '<input type="hidden" name="_token" value="<?= hash_hmac(\'sha256\', CURRENT_URI, $_SESSION[\'csrf_token\']); ?>"/>';
 	}
 }
