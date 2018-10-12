@@ -1,7 +1,10 @@
 <?php
 namespace Mortar\App\Controllers;
 
-class TestController {
+use Mortar\Mortar\Mortar;
+use Mortar\Mortar\Display\Controller;
+
+class TestController extends Controller {
 
 	public function test() {
 		echo 'test controller';

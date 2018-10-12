@@ -1,6 +1,8 @@
 <?php
 namespace Mortar\Mortar\Http;
 
+use Mortar\Mortar\Mortar;
+
 class RouteWorker {
 
 	/**
@@ -13,20 +15,14 @@ class RouteWorker {
 		'all' => '[\w-]'
 	];
 
+	private $mortar;
 	private $prefix;
 	private $before;
 
-	public function __construct($prefix, $before) {
+	public function __construct($mortar, $prefix, $before) {
+		$this->mortar = $mortar;
 		$this->prefix = $prefix;
 		$this->before = $this->processMiddlewares($before);
-	}
-
-	public function getPrefix() {
-		return $this->prefix;
-	}
-
-	public function getBefore() {
-		return $this->before;
 	}
 
 	public function processMiddlewares($before) {
@@ -113,7 +109,7 @@ class RouteWorker {
 				list($class, $function) = explode('@', $callback);
 			} else list($class, $function) = [$callback, 'handle'];
 				if(method_exists($class, $function)) {
-					$callback = [$class, $function];
+					$callback = [new $class($this->mortar), $function];
 				}
 		}
 		return $callback;

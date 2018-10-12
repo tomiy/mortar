@@ -1,8 +1,9 @@
 <?php
+use Mortar\Mortar\Mortar;
 use Mortar\Mortar\Http\Router;
 use Mortar\Foundation\Tools\Debug;
 
-$router = new Router();
+$router = new Router(Mortar::getInstance());
 
 $router->get('/', function() {
 	Debug::show('hello world');

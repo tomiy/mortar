@@ -2,10 +2,8 @@
 namespace Mortar\Mortar;
 
 use Mortar\Foundation\Traits\Singleton;
-use Mortar\Foundation\Tools\Debug;
 
 use Mortar\Mortar\Http\Router;
-
 use Mortar\Mortar\Build\Parser;
 
 class Mortar extends Singleton {
