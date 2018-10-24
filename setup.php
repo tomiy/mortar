@@ -6,17 +6,17 @@
  * @return string         the relative path
  */
 function relativePath($source, $destin) {
-	$arFrom = explode(DS, rtrim($source, DS));
-	$arTo = explode(DS, rtrim($destin, DS));
-	while(count($arFrom) && count($arTo) && ($arFrom[0] == $arTo[0])) {
-		array_shift($arFrom);
-		array_shift($arTo);
-	}
-	return rtrim(str_pad('', count($arFrom) * 3, '..'.DS).implode(DS, $arTo), DS);
+    $arFrom = explode(DS, rtrim($source, DS));
+    $arTo = explode(DS, rtrim($destin, DS));
+    while(count($arFrom) && count($arTo) && ($arFrom[0] == $arTo[0])) {
+        array_shift($arFrom);
+        array_shift($arTo);
+    }
+    return rtrim(str_pad('', count($arFrom) * 3, '..'.DS).implode(DS, $arTo), DS);
 }
 
 function escape($string) {
-	return htmlentities(mb_convert_encoding($string, 'UTF-8', 'UTF-8'), ENT_QUOTES, 'UTF-8');
+    return htmlentities(mb_convert_encoding($string, 'UTF-8', 'UTF-8'), ENT_QUOTES, 'UTF-8');
 }
 
 define('CLASS_DIR', relativePath(getcwd(), dirname(__DIR__)).DS);
