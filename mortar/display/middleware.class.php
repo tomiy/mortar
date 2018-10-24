@@ -10,5 +10,5 @@ class Middleware {
 		$this->mortar = $mortar;
 	}
 
-	public function handle() {};
+	public function handle() {}
 }
