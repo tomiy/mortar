@@ -6,12 +6,12 @@ use Mortar\Mortar\Display\Controller;
 
 class TestController extends Controller {
 
-	public function test() {
-		echo 'test controller';
-	}
+    public function test() {
+        echo 'test controller';
+    }
 
-	public function key($key) {
-		echo escape("key: $key");
-	}
+    public function key($key) {
+        echo escape("key: $key");
+    }
 
 }

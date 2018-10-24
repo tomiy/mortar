@@ -6,8 +6,8 @@ use Mortar\Mortar\Display\Middleware;
 
 class TestMiddleware extends Middleware {
 
-	public function handle() {
-		echo '1st ';
-	}
+    public function handle() {
+        echo '1st ';
+    }
 
 }
