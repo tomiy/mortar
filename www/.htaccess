@@ -10,4 +10,4 @@ RewriteRule ^.*$ - [E=CWD:%2]
 RewriteCond %{REQUEST_FILENAME} !-f
 RewriteCond %{REQUEST_FILENAME} !-d
 RewriteRule ^(.*)([^/])$ %{ENV:CWD}$1$2/ [L,R=301]
-RewriteRule !^exclude %{ENV:CWD}index.php [L,NC]
+RewriteRule !^index.php %{ENV:CWD}index.php [L,NC]
