@@ -48,7 +48,7 @@ class Mortar extends Singleton {
 
     private function setViewPath($key, $path) {
         if(!is_dir(realpath($path))) {
-            echo escape("Warning, folder $path does not exist.");
+            echo "Warning, folder $path does not exist.";
             return;
         }
         $this->views[$key] = realpath($path).DS;
