@@ -1,4 +1,4 @@
-<?php session_start();
+<?php
 
 define('CURRENT_URI', explode('?', str_replace(dirname($_SERVER['PHP_SELF']), '', $_SERVER['REQUEST_URI']))[0]);
 

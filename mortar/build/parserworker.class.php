@@ -11,7 +11,7 @@ class ParserWorker {
     }
 
     public function var($var) {
-        return '<?=escape($this->variables[\''.$var.'\'])?>';
+        return '<?=$this->variables[\''.$var.'\']?>';
     }
 
     public function loop($counter, $content) {

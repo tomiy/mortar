@@ -1,4 +1,5 @@
 <?php define('DS', DIRECTORY_SEPARATOR);
+
 /**
  * Gets the relative path between two paths
  * @param  string $source the source path
@@ -15,13 +16,23 @@ function relativePath($source, $destin) {
     return rtrim(str_pad('', count($arFrom) * 3, '..'.DS).implode(DS, $arTo), DS);
 }
 
-function escape($string) {
-    return htmlentities(mb_convert_encoding($string, 'UTF-8', 'UTF-8'), ENT_QUOTES, 'UTF-8');
+function refresh_token() {
+    $_SESSION['csrf_token'] = null;
+    generate_token();
+}
+
+function generate_token() {
+    if (empty($_SESSION['csrf_token'])) {
+        $_SESSION['csrf_token'] = bin2hex(random_bytes(32));
+    }
 }
 
 define('CLASS_DIR', relativePath(getcwd(), dirname(__DIR__)).DS);
 set_include_path(get_include_path().PATH_SEPARATOR.CLASS_DIR);
 spl_autoload_extensions('.class.php');
 spl_autoload_register();
+
+session_start();
+generate_token();
 
 require_once __DIR__.DS.'config.php';

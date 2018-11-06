@@ -11,7 +11,7 @@ class TestController extends Controller {
     }
 
     public function key($key) {
-        echo escape("key: $key");
+        echo "key: $key";
     }
 
 }
