@@ -91,7 +91,7 @@ class Mortar extends Singleton {
         //display
         if($this->template) {
             $compiled = $this->compile($this->template);
-            include $compiled;
+            include_once $compiled;
         }
 
         echo $debug?$errorReporting:null;

@@ -28,10 +28,10 @@ class ParserWorker {
 
     public function template($name) {
         $cmpPath = $this->mortar->compile($name);
-        return "<? include $cmpPath ?>";
+        return "<?include $cmpPath?>";
     }
 
     public function csrf() {
-        return '<input type="hidden" name="_token" value="<?= hash_hmac(\'sha256\', CURRENT_URI, $_SESSION[\'csrf_token\']); ?>"/>';
+        return '<input type="hidden" name="_token" value="<?=hash_hmac(\'sha256\', CURRENT_URI, $_SESSION[\'csrf_token\'])?>"/>';
     }
 }

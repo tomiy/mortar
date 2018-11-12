@@ -1,6 +1,9 @@
 <?php
 namespace Mortar\Foundation\Traits;
 
+/**
+ * The singleton trait, makes it so i can't instantiate more than 1 of a given class
+ */
 abstract class Singleton {
 
     /**
@@ -13,6 +16,7 @@ abstract class Singleton {
 
     /**
      * Create the instance if necessary then return it
+     * @var array $params the parameters to instanciate the class
      * @return object the instance
      */
     public static function getInstance($params = null) {
