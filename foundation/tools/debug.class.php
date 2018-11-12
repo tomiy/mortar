@@ -1,6 +1,9 @@
 <?php
 namespace Mortar\Foundation\Tools;
 
+/**
+ * Prints an object into a collapsible table
+ */
 abstract class Debug {
 
     /**
