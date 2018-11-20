@@ -6,29 +6,25 @@ use Mortar\Foundation\Traits\Singleton;
 use Mortar\Mortar\Http\Router;
 use Mortar\Mortar\Build\Parser;
 
-class Mortar extends Singleton {
+class Core extends Singleton {
     private $views;
 
     private $parser;
     private $template;
     private $variables;
 
+    public $request;
+
     /**
      * Instanciate the paths with config values
      * Start capturing the output used for debug
      */
-    protected function __construct($params = null) {
+    protected function __construct($request, $tplPath = VIEWS_TEMPLATES, $cmpPath = VIEWS_COMPILED) {
         ob_start();
-        $this->setTemplatesPath(
-            isset($params['views']['templates'])?
-                $params['views']['templates']:
-                VIEWS_TEMPLATES
-        );
-        $this->setCompiledPath(
-            isset($params['views']['compiled'])?
-                $params['views']['compiled']:
-                VIEWS_COMPILED
-        );
+        $this->setTemplatesPath($tplPath);
+        $this->setCompiledPath($cmpPath);
+
+        $this->request = $request;
 
         $this->parser = new Parser($this);
         $this->variables = [];

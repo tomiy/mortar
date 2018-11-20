@@ -5,7 +5,7 @@ It provides a simple syntax to perform actions such as including a file, getting
 _it's not obligatory but strongly recommended that you put your mortar directory outside of the user's reach, and use custom directories for anything public. .htaccess files are provided but may not be enough!_
 
 ## Change log
-###### _Changes listed in no particular order_
+#### _Changes listed in no particular order_
 
 * __V0.1__ _(initial version)_
     * Autoloader
@@ -16,3 +16,7 @@ _it's not obligatory but strongly recommended that you put your mortar directory
     * Middleware and controller support
     * Csrf protection
     * Customizable settings
+
+## Todo
+* Refactor objects to route into a core component for better dependancy management
+* Add a dynamic flexible way to add functions to the template parser
