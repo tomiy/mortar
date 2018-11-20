@@ -1,7 +1,7 @@
 <?php
 namespace Mortar\Mortar\Display;
 
-use Mortar\Mortar\Mortar;
+use Mortar\Mortar\Core;
 
 class Middleware {
     private $mortar;

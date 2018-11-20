@@ -1,7 +1,7 @@
 <?php
 namespace Mortar\Mortar\Build;
 
-use Mortar\Mortar\Mortar;
+use Mortar\Mortar\Core;
 
 /**
  * Parses templates into php output

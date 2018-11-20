@@ -1,5 +1,5 @@
 <?php
-use Mortar\Mortar\Mortar;
+use Mortar\Mortar\Core;
 use Mortar\Mortar\Http\Router;
 use Mortar\Foundation\Tools\Debug;
 

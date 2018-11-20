@@ -21,7 +21,7 @@ abstract class Singleton {
      */
     public static function getInstance($params = null) {
         static $instance = false;
-        if(empty($instance)) $instance = new static($params);
+        if(empty($instance)) $instance = new static(...$params);
         return $instance;
     }
 }
