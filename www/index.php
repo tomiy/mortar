@@ -4,8 +4,6 @@ use Mortar\Mortar\Core;
 use Mortar\Mortar\Http\Request;
 use Mortar\Mortar\Http\Router;
 
-Router::loadRequest(new Request($_GET, $_POST, $_SESSION, $_COOKIE, $_SERVER));
-
 $mortar = Core::getInstance(new Request($_GET, $_POST, $_SESSION, $_COOKIE, $_SERVER));
 
 require_once APP_ROUTES;
