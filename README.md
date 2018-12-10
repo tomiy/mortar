@@ -18,5 +18,5 @@ _it's not obligatory but strongly recommended that you put your mortar directory
     * Customizable settings
 
 ## Todo
-* Refactor objects to route into a core component for better dependancy management
+* Refactor objects to route into a core component for better dependancy management (partly done)
 * Add a dynamic flexible way to add functions to the template parser
