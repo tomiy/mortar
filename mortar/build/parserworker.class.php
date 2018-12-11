@@ -32,6 +32,6 @@ class ParserWorker {
     }
 
     public function csrf() {
-        return '<input type="hidden" name="_token" value="<?=hash_hmac(\'sha256\', getenv(\'CWD\'), $_SESSION[\'csrf_token\'])?>"/>';
+        return '<input type="hidden" name="_token" value="<?=hash_hmac(\'sha256\', CURRENT_URI, $_SESSION[\'csrf_token\'])?>"/>';
     }
 }

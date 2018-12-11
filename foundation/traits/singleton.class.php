@@ -19,7 +19,7 @@ abstract class Singleton {
      * @var array $params the parameters to instanciate the class
      * @return object the instance
      */
-    public static function getInstance($params = null) {
+    public static function getInstance($params = []) {
         static $instance = false;
         if(empty($instance)) $instance = new static(...$params);
         return $instance;

@@ -122,7 +122,7 @@ class Router {
 
         // if static method, callback and bail out
         if(array_key_exists(
-            $static_uri = str_replace('/', '\/', getenv('CWD')),
+            $static_uri = str_replace('/', '\/', CURRENT_URI),
             static::$routes[static::$response->getMethod()])
         ) {
             $found = true;
@@ -136,7 +136,7 @@ class Router {
             $callback = $callbacks['callback'];
             $before = $callbacks['before'];
             // if match then callback and bail out
-            if(preg_match("/^$route$/", getenv('CWD'), $arguments)) {
+            if(preg_match("/^$route$/", CURRENT_URI, $arguments)) {
                 $found = true;
                 // remove non custom matches
                 $arguments = array_filter($arguments, function($key) {
