@@ -41,11 +41,15 @@ class Parser {
             $params = explode('|', $matches[2]);
             $callback = array_shift($params);
 
-            if(is_callable([$this->worker, $callback])) {
+            if(is_callable($this->worker->tags[$callback])) {
                 return $this->worker->$callback(...$params);
             } else return htmlspecialchars($matches[1]);
         }, $template);
 
         return (is_null($stamp)?'':"<?php#$stamp?>\n").$parsed;
+    }
+
+    public function tag($tag, $callback) {
+        $this->worker->tags[$tag] = $callback;
     }
 }
