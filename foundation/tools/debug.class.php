@@ -74,7 +74,7 @@ abstract class Debug {
                     // trick to get variable access since they get cast weirdly by default
                     // namespace also prepended to the variable name
                     $_k = explode("\0", $k);
-                    $name =
+                    @$name =
                         $objectClass.'\\'.$_k[0].$_k[2].':'.
                         [
                             NULL => 'public',

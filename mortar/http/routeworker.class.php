@@ -9,20 +9,32 @@ class RouteWorker {
      * The shortcuts used to parse to regex (makes route writing much easier)
      * @var array
      */
-    private static $shorthands = [
+    private $shorthands = [
         'int' => '\d',
         'str' => '[a-zA-Z-]',
         'all' => '[\w-]'
     ];
 
     private $mortar;
-    private $prefix;
-    private $before;
 
-    public function __construct($mortar, $prefix, $before) {
+    private $routectx;
+    private $middlewarectx;
+
+    public function __construct($mortar) {
         $this->mortar = $mortar;
-        $this->prefix = $prefix;
-        $this->before = $this->processMiddlewares($before);
+
+        $this->routectx = [];
+        $this->middlewarectx = [];
+    }
+
+    public function pushContext($routectx, $middlewarectx) {
+        array_push($this->routectx, $routectx);
+        array_push($this->middlewarectx, $this->processMiddlewares($middlewarectx));
+    }
+
+    public function popContext() {
+        array_pop($this->routectx);
+        array_pop($this->middlewarectx);
     }
 
     public function processMiddlewares($before) {
@@ -38,8 +50,8 @@ class RouteWorker {
 
     public function addMiddlewares($before) {
         $output = [];
-        if($this->before != null) {
-            foreach ($this->before as $groupmiddleware) {
+        if($this->middlewarectx != null) {
+            foreach (call_user_func_array('array_merge', $this->middlewarectx) as $groupmiddleware) {
                 $output[] = $groupmiddleware;
             }
         }
@@ -53,12 +65,8 @@ class RouteWorker {
     }
 
     public function fixRoute($route) {
-        // force slashes on both sides
         $route = '/'.trim($route,'/').($route=='/'?'':'/');
-        // prepend group route if we can
-        if($this->prefix != null) {
-            $route = rtrim($this->prefix, '/').$route;
-        }
+        if($this->routectx) $route = rtrim(implode('/', $this->routectx), '/').$route;
         return $route;
     }
 
@@ -85,8 +93,8 @@ class RouteWorker {
                 list($pattern, $name) = explode(':', $routePart);
                 // replace the shorthands with regex
                 $pattern = str_replace(
-                    array_keys(static::$shorthands),
-                    array_values(static::$shorthands),
+                    array_keys($this->shorthands),
+                    array_values($this->shorthands),
                     empty($pattern)?'all':$pattern);
                 // add a nice matchable pattern to the parsed route
                 $parsedRoute .= "(?P<$name>$pattern+)\/";

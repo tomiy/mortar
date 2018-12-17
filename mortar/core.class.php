@@ -60,6 +60,10 @@ class Core extends Singleton {
         $this->template = $name;
     }
 
+    public function tag($tag, $callback) {
+        $this->parser->tag($tag, $callback);
+    }
+
     private function compile($tpl) {
         $tplContents = file_get_contents($tplPath = $this->tplpath().$tpl.VIEWS_EXTENSION);
         if(
