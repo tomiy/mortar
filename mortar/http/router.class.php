@@ -1,16 +1,18 @@
 <?php
 namespace Mortar\Mortar\Http;
 
+use Mortar\Foundation\Traits\Singleton;
+
 use Mortar\Mortar\Core;
 use Mortar\Mortar\Http\RouteWorker;
 
-class Router {
+class Router extends Singleton {
     /**
      * The routes + attached middleware
      * @var array
      */
-    private static $routes = [];
-    private static $response;
+    private $routes = [];
+    private $response;
 
     private $mortar;
     private $worker;
@@ -20,19 +22,22 @@ class Router {
      * @param string $prefix the route group
      * @param mixed  $before the group middleware
      */
-    public function __construct($mortar, $prefix = null, $before = null) {
-
-        if(!static::$response) static::$response = new RouteResponse($mortar->request);
+    protected function __construct($mortar) {
+        $this->response = new RouteResponse($mortar->request);
         $this->mortar = $mortar;
-        $this->worker = new RouteWorker($mortar, $prefix, $before);
+        $this->worker = new RouteWorker($mortar);
+    }
+
+    public function routes() {
+        return $this->routes;
     }
 
     /**
      * Sets the 404 callback
      * @var callback
      */
-    public static function setNotFound($callback) {
-        static::$response->setNotFound($callback);
+    public function setNotFound($callback) {
+        $this->response->setNotFound($callback);
     }
 
     /**
@@ -94,13 +99,13 @@ class Router {
         $before = $this->worker->processMiddlewares($before);
 
         // add route to collection
-        static::$routes[$method][$route] = [
+        $this->routes[$method][$route] = [
             'callback' => $callback,
             'before' => []
         ];
 
         // add group middleware if we can
-        static::$routes[$method][$route]['before'] = $this->worker->addMiddlewares($before);
+        $this->routes[$method][$route]['before'] = $this->worker->addMiddlewares($before);
     }
 
     /**
@@ -110,29 +115,30 @@ class Router {
      * @param mixed    $before   the group middleware
      */
     public function group($route, $callback, $before = null) {
-        $route = $this->worker->fixRoute($route);
-        $callback(new self($this->mortar, $route, $before));
+        $this->worker->pushContext($route, $before);
+        $callback($this);
+        $this->worker->popContext();
     }
 
     /**
      * try to match the uri to a route, and launch callbacks as applicable
      */
-    public static function dispatch() {
+    public function dispatch() {
         $found = false;
 
         // if static method, callback and bail out
         if(array_key_exists(
             $static_uri = str_replace('/', '\/', CURRENT_URI),
-            static::$routes[static::$response->getMethod()])
+            $this->routes[$this->response->getMethod()])
         ) {
             $found = true;
-            foreach (static::$routes[static::$response->getMethod()][$static_uri]['before'] as $middleware) {
+            foreach ($this->routes[$this->response->getMethod()][$static_uri]['before'] as $middleware) {
                 call_user_func($middleware);
             }
-            call_user_func(static::$routes[static::$response->getMethod()][$static_uri]['callback']);
+            call_user_func($this->routes[$this->response->getMethod()][$static_uri]['callback']);
 
         // else try looping through the table and match a regex
-    } else foreach (static::$routes[static::$response->getMethod()] as $route => $callbacks) {
+    } else foreach ($this->routes[$this->response->getMethod()] as $route => $callbacks) {
             $callback = $callbacks['callback'];
             $before = $callbacks['before'];
             // if match then callback and bail out
@@ -154,7 +160,7 @@ class Router {
 
         // if not found display 404
         if(!$found) {
-            static::$response->notFound();
+            $this->response->notFound();
         }
     }
 }

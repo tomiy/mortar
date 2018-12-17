@@ -9,10 +9,10 @@ class ParserWorker {
 
     public function __construct($parser, $mortar) {
         $this->tags = [
-            'var' => $this->$var,
-            'loop' => $this->$loop,
-            'template' => $this->$template,
-            'csrf' => $this->$csrf
+            'var' => [$this, 'var'],
+            'loop' => [$this, 'loop'],
+            'template' => [$this, 'template'],
+            'csrf' => [$this, 'csrf'],
         ];
         $this->parser = $parser;
         $this->mortar = $mortar;
