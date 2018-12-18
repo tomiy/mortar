@@ -17,7 +17,12 @@ _it's not obligatory but strongly recommended that you put your mortar directory
     * Csrf protection
     * Customizable settings
 
+* __V0.3__
+    * Dynamic template parsing
+    * Customizable parser tags
+    * High performance modular http routing
+
 ## Todo
-* Refactor objects to route into a core component for better dependancy management (partly done)
-* Add a dynamic flexible way to add functions to the template parser (sloppily done)
-* Rework the router into a contextuable object to avoid reinstanciating too much (done)
+* ✅ Refactor objects to route into a core component for better dependancy management
+* ✅ Add a dynamic flexible way to add functions to the template parser
+* ✅ Rework the router into a contextuable object to avoid reinstanciating too much
