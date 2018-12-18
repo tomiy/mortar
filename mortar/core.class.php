@@ -9,6 +9,7 @@ use Mortar\Mortar\Build\Parser;
 class Core extends Singleton {
     private $views;
 
+    private $router;
     private $parser;
     private $template;
     private $variables;
@@ -26,8 +27,13 @@ class Core extends Singleton {
 
         $this->request = $request;
 
+        $this->router = new Router($this);
         $this->parser = new Parser($this);
         $this->variables = [];
+    }
+
+    public function component($component) {
+        return $this->$component;
     }
 
     //shorthands

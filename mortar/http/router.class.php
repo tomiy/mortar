@@ -6,7 +6,7 @@ use Mortar\Foundation\Traits\Singleton;
 use Mortar\Mortar\Core;
 use Mortar\Mortar\Http\RouteWorker;
 
-class Router extends Singleton {
+class Router {
     /**
      * The routes + attached middleware
      * @var array

@@ -10,6 +10,6 @@ $mortar = Core::getInstance([
 
 require_once APP_ROUTES;
 
-Router::getInstance()->dispatch();
+$mortar->component('router')->dispatch();
 
 $mortar->display(true);

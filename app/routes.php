@@ -3,9 +3,7 @@ use Mortar\Mortar\Core;
 use Mortar\Mortar\Http\Router;
 use Mortar\Foundation\Tools\Debug;
 
-$router = Router::getInstance([
-    Core::getInstance()
-]);
+$router = Core::getInstance()->component('router');
 
 $router->get('/', function() {
     Debug::show('hello world');

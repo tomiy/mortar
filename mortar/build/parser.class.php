@@ -11,7 +11,9 @@ class Parser {
     private $mortar;
     private $worker;
     private $variables;
-
+    
+    private $tags;
+    
     /**
      * instanciate a parser and give it a worker
      * @param object $mortar the mortar instance
@@ -19,6 +21,8 @@ class Parser {
     public function __construct($mortar) {
         $this->mortar = $mortar;
         $this->worker = new ParserWorker($this, $mortar);
+    
+        $this->tags = [];
     }
 
     /**
@@ -42,7 +46,7 @@ class Parser {
             $callback = array_shift($params);
 
             if(is_callable($this->worker->tags[$callback])) {
-                return $this->worker->$callback(...$params);
+                return $this->tags[$callback](...$params);
             } else return htmlspecialchars($matches[1]);
         }, $template);
 
@@ -50,6 +54,6 @@ class Parser {
     }
 
     public function tag($tag, $callback) {
-        $this->worker->tags[$tag] = $callback;
+        $this->tags[$tag] = $callback;
     }
 }
