@@ -26,5 +26,5 @@ $parser->tag('template', function($name) use($mortar){
 });
 
 $parser->tag('csrf', function() {
-    return '<input type="hidden" name="_token" value="<?=hash_hmac(\'sha256\', CURRENT_URI, $_SESSION[\'csrf_token\'])?>"/>';
+    return '<?=hash_hmac(\'sha256\', CURRENT_URI, $_SESSION[\'csrf_token\'])?>';
 });
