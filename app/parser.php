@@ -4,10 +4,6 @@ use Mortar\Mortar\Core;
 $mortar = Core::getInstance();
 $parser = $mortar->component('parser');
 
-$parser->tag('var', function($var) {
-    return '<?=$this->variables[\''.$var.'\']?>';
-});
-
 $parser->tag('loop', function($counter, $content) use($parser) {
     $counter = $parser->parse($counter);
     $content = $parser->parse($content);

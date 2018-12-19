@@ -45,6 +45,8 @@ class Parser {
 
             if(is_callable($this->tags[$callback])) {
                 return $this->tags[$callback](...$params);
+            } else if(isset($this->variables[$callback])) {
+                return '<?=$this->variables[\''.$callback.'\']?>';
             } else return htmlspecialchars($matches[1]);
         }, $template);
 
