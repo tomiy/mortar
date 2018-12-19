@@ -1,1 +1,2 @@
-<%m:loop|5|<%m:csrf%>%>
+{{m:loop|2|{{m:csrf}}<br>
+}}

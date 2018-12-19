@@ -9,7 +9,6 @@ use Mortar\Mortar\Core;
 class Parser {
 
     private $mortar;
-    private $worker;
     private $variables;
     
     private $tags;
@@ -20,7 +19,6 @@ class Parser {
      */
     public function __construct($mortar) {
         $this->mortar = $mortar;
-        $this->worker = new ParserWorker($this, $mortar);
     
         $this->tags = [];
     }
@@ -45,7 +43,7 @@ class Parser {
             $params = explode('|', $matches[2]);
             $callback = array_shift($params);
 
-            if(is_callable($this->worker->tags[$callback])) {
+            if(is_callable($this->tags[$callback])) {
                 return $this->tags[$callback](...$params);
             } else return htmlspecialchars($matches[1]);
         }, $template);

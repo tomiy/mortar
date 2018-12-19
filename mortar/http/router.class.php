@@ -22,7 +22,7 @@ class Router {
      * @param string $prefix the route group
      * @param mixed  $before the group middleware
      */
-    protected function __construct($mortar) {
+    public function __construct($mortar) {
         $this->response = new RouteResponse($mortar->request);
         $this->mortar = $mortar;
         $this->worker = new RouteWorker($mortar);

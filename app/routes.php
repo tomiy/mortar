@@ -3,10 +3,12 @@ use Mortar\Mortar\Core;
 use Mortar\Mortar\Http\Router;
 use Mortar\Foundation\Tools\Debug;
 
-$router = Core::getInstance()->component('router');
+$mortar = Core::getInstance();
+$router = $mortar->component('router');
 
-$router->get('/', function() {
+$router->get('/', function() use($mortar) {
     Debug::show('hello world');
+    $mortar->view('testtemplate');
 });
 
 $router->get('/routes/', function() use($router) {
