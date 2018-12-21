@@ -1,7 +1,4 @@
 <?php
-define('CURRENT_URI', explode('?', str_replace(dirname($_SERVER['PHP_SELF']), '', $_SERVER['REQUEST_URI']))[0]);
-
-define('MORTAR_VERSION', '0.3.0');
 
 define('APP_DIR', CLASS_DIR.'mortar'.DS.'app'.DS);
     define('APP_PARSER', APP_DIR.'parser.php');
