@@ -7,16 +7,27 @@ $parser = $mortar->component('parser');
 $parser->tag('loop', function($counter, $content) use($parser) {
     $counter = $parser->parse($counter);
     $content = $parser->parse($content);
-    $output = '';
 
-    for ($i = 0; $i < $counter; $i++) {
+    for ($i = 0, $output = ''; $i < $counter; $i++) {
         $output .= $content;
     }
-
     return $output;
 });
 
-$parser->tag('template', function($name) use($mortar){
+$parser->tag('each', function($variable, $tag, $content) use($parser) {
+    $tag = $parser->parse($tag);
+    $content = $parser->parse($content);
+    $output = '';
+
+    foreach ($parser->get($variable) as $value) {
+        $output .= str_replace($tag, $value, $content);
+    }
+    return $output;
+});
+
+$parser->tag('template', function($name) use($mortar, $parser) {
+    $name = $parser->parse($name);
+    
     $cmpPath = $mortar->compile($name);
     return "<?include $cmpPath?>";
 });

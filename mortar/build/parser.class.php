@@ -31,6 +31,14 @@ class Parser {
         $this->variables = $variables;
     }
 
+    public function get($var) {
+        return $this->variables[$var];
+    }
+
+    public function tag($tag, $callback) {
+        $this->tags[$tag] = $callback;
+    }
+
     /**
      * parse the template
      * @param string $template the template to parse
@@ -51,9 +59,5 @@ class Parser {
         }, $template);
 
         return (is_null($stamp)?'':"<?php#$stamp?>\n").$parsed;
-    }
-
-    public function tag($tag, $callback) {
-        $this->tags[$tag] = $callback;
     }
 }

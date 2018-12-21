@@ -11,6 +11,6 @@ define('APP_DIR', CLASS_DIR.'mortar'.DS.'app'.DS);
         define('VIEWS_COMPILED', APP_VIEWS.'compiled'.DS);
         define('VIEWS_EXTENSION', '.tpl');
 
-define('PARSER_OPEN', '{{m:');
+define('PARSER_OPEN', '{{');
 define('PARSER_STOP', '}}');
 define('PARSER_MASK', count_chars(PARSER_OPEN.PARSER_STOP, 3));

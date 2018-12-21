@@ -1,2 +1,3 @@
-{{m:loop|2|{{m:csrf}}<br>
+{{loop|2|
+    {{csrf}}<br>
 }}
