@@ -1,6 +1,13 @@
 RewriteEngine On
 
+RewriteBase /
+#Get the CWD
+RewriteCond %{REQUEST_FILENAME} !-f
+RewriteCond $0#%{REQUEST_URI} ([^#]*)#(.*)\1$
+RewriteRule ^.*$ - [E=CWD:%2]
+
+#Force trailing slash
 RewriteCond %{REQUEST_FILENAME} !-f
 RewriteCond %{REQUEST_FILENAME} !-d
-RewriteRule ^(.*)([^/])$ $1$2/ [L,R=301]
-RewriteRule ^.*$ index.php [L,NC]
+RewriteRule ^(.*)([^/])$ %{ENV:CWD}$1$2/ [L,R=301]
+RewriteRule !^index.php %{ENV:CWD}index.php [L,NC]
