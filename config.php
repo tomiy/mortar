@@ -1,6 +1,6 @@
 <?php
 
-define('APP_DIR', CLASS_DIR.'mortar'.DS.'app'.DS);
+define('APP_DIR', 'app'.DS);
     define('APP_PARSER', APP_DIR.'parser.php');
     define('APP_ROUTES', APP_DIR.'routes.php');
     define('APP_VIEWS', APP_DIR.'views'.DS);

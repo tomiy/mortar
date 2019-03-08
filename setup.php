@@ -27,6 +27,12 @@ function generate_token() {
     }
 }
 
+function path($path = null) {
+    static $o;
+    if($path) $o = $path;
+    return $o?$o:CLASS_DIR.'mortar'.DS;
+}
+
 define('MORTAR_VERSION', '0.3.1');
 define('CLASS_DIR', relativePath(getcwd(), dirname(__DIR__)).DS);
 define('CURRENT_URI', explode('?', str_replace(dirname($_SERVER['PHP_SELF']), '', $_SERVER['REQUEST_URI']))[0]);

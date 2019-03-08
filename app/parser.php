@@ -4,6 +4,13 @@ use Mortar\Mortar\Core;
 $mortar = Core::getInstance();
 $parser = $mortar->component('parser');
 
+$parser->tag('get', function($name, $default = null) use($parser) {
+    $name = $parser->parse($name);
+    $default = $parser->parse($default);
+
+    return "<?=isset(\$_GET['$name'])?\$_GET['$name']:'$default'?>";
+});
+
 $parser->tag('loop', function($counter, $content) use($parser) {
     $counter = $parser->parse($counter);
     $content = $parser->parse($content);
