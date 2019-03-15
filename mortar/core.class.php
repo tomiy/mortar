@@ -22,8 +22,8 @@ class Core extends Singleton {
      */
     protected function __construct($request, $tplPath = VIEWS_TEMPLATES, $cmpPath = VIEWS_COMPILED) {
         ob_start();
-        $this->setTemplatesPath($tplPath);
-        $this->setCompiledPath($cmpPath);
+        $this->setTemplatesPath(path().$tplPath);
+        $this->setCompiledPath(path().$cmpPath);
 
         $this->request = $request;
 

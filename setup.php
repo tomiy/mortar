@@ -1,4 +1,9 @@
-<?php define('DS', DIRECTORY_SEPARATOR);
+<?php
+
+define('DS', DIRECTORY_SEPARATOR);
+define('MORTAR_VERSION', '0.3.1');
+define('CLASS_DIR', relativePath(getcwd(), dirname(__DIR__)).DS);
+define('CURRENT_URI', explode('?', str_replace(dirname($_SERVER['PHP_SELF']), '', $_SERVER['REQUEST_URI']))[0]);
 
 /**
  * Gets the relative path between two paths
@@ -32,10 +37,6 @@ function path($path = null) {
     if($path) $o = $path;
     return $o?$o:CLASS_DIR.'mortar'.DS;
 }
-
-define('MORTAR_VERSION', '0.3.1');
-define('CLASS_DIR', relativePath(getcwd(), dirname(__DIR__)).DS);
-define('CURRENT_URI', explode('?', str_replace(dirname($_SERVER['PHP_SELF']), '', $_SERVER['REQUEST_URI']))[0]);
 
 set_include_path(get_include_path().PATH_SEPARATOR.CLASS_DIR);
 spl_autoload_extensions('.class.php');
