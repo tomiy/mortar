@@ -4,7 +4,7 @@ namespace Mortar\Mortar\Display;
 use Mortar\Mortar\Core;
 
 class Middleware {
-    private $mortar;
+    protected $mortar;
 
     public function __construct($mortar) {
         $this->mortar = $mortar;
