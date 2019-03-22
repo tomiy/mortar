@@ -3,7 +3,15 @@
 define('DS', DIRECTORY_SEPARATOR);
 define('MORTAR_VERSION', '0.3.1');
 define('CLASS_DIR', relativePath(getcwd(), dirname(__DIR__)).DS);
-define('CURRENT_URI', explode('?', str_replace(dirname($_SERVER['PHP_SELF']), '', $_SERVER['REQUEST_URI']))[0]);
+define('CURRENT_URI', 
+    str_pad( // edge case if we're at site root (REQUEST_URI & PHP_SELF are both '/')
+        explode( // remove the get parameters
+            '?', str_replace( // in case we're in a subdirectory, remove the root path from the uri
+                dirname($_SERVER['PHP_SELF']), '', $_SERVER['REQUEST_URI']
+                )
+        )[0], 1, '/'
+    )
+);
 
 /**
  * Gets the relative path between two paths
