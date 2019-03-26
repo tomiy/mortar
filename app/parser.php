@@ -1,5 +1,5 @@
 <?php
-use Mortar\Mortar\Core;
+use Mortar\Engine\Core;
 
 $mortar = Core::getInstance();
 $parser = $mortar->component('parser');

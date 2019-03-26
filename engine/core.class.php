@@ -3,8 +3,8 @@ namespace Mortar\Mortar;
 
 use Mortar\Foundation\Traits\Singleton;
 
-use Mortar\Mortar\Http\Router;
-use Mortar\Mortar\Build\Parser;
+use Mortar\Engine\Http\Router;
+use Mortar\Engine\Build\Parser;
 
 class Core extends Singleton {
     private $views;

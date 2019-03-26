@@ -1,7 +1,7 @@
 <?php
-namespace Mortar\Mortar\Display;
+namespace Mortar\Engine\Display;
 
-use Mortar\Mortar\Core;
+use Mortar\Engine\Core;
 
 class Controller {
     protected $mortar;

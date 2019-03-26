@@ -1,8 +1,8 @@
 <?php
 namespace Mortar\App\Controllers;
 
-use Mortar\Mortar\Core;
-use Mortar\Mortar\Display\Controller;
+use Mortar\Engine\Core;
+use Mortar\Engine\Display\Controller;
 
 class TestController extends Controller {
 

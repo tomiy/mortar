@@ -1,8 +1,8 @@
 <?php require_once '../setup.php';
 
-use Mortar\Mortar\Core;
-use Mortar\Mortar\Http\Request;
-use Mortar\Mortar\Http\Router;
+use Mortar\Engine\Core;
+use Mortar\Engine\Http\Request;
+use Mortar\Engine\Http\Router;
 
 $mortar = Core::getInstance([
     new Request($_GET, $_POST, $_SESSION, $_COOKIE, $_SERVER)

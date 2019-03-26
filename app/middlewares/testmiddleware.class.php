@@ -1,8 +1,8 @@
 <?php
 namespace Mortar\App\Middlewares;
 
-use Mortar\Mortar\Core;
-use Mortar\Mortar\Display\Middleware;
+use Mortar\Engine\Core;
+use Mortar\Engine\Display\Middleware;
 
 class TestMiddleware extends Middleware {
 

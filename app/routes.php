@@ -1,6 +1,6 @@
 <?php
-use Mortar\Mortar\Core;
-use Mortar\Mortar\Http\Router;
+use Mortar\Engine\Core;
+use Mortar\Engine\Http\Router;
 use Mortar\Foundation\Tools\Debug;
 
 $mortar = Core::getInstance();
