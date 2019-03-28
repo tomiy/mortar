@@ -1,4 +1,4 @@
-<?php#1545227544?>
+<?php#1545757463?>
 
     <?=hash_hmac('sha256', CURRENT_URI, $_SESSION['csrf_token'])?><br>
 

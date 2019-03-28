@@ -26,6 +26,6 @@ _it's not obligatory but strongly recommended that you put your mortar directory
 * ✅ Refactor objects to route into a core component for better dependancy management
 * ✅ Add a dynamic flexible way to add functions to the template parser
 * ✅ Rework the router into a contextuable object to avoid reinstanciating too much
-* 🚧 Add a default controller/middleware scope for static router calls
+* ✅ Add a default controller/middleware scope for static router calls
 * 🚧 Add a DB manager to make generic calls
 * 🚧 Add a Model structure with relationships and elegant fetching

@@ -17,6 +17,8 @@ class Router {
     private $mortar;
     private $worker;
 
+    private $scope;
+
     /**
      * Instanciate a new router
      * @param string $prefix the route group
@@ -26,6 +28,15 @@ class Router {
         $this->response = new RouteResponse($mortar->request);
         $this->mortar = $mortar;
         $this->worker = new RouteWorker($mortar);
+        $this->scope = 'Mortar\App\\';
+    }
+
+    public function getScope() {
+        return $this->scope;
+    }
+
+    public function setScope($scope) {
+        $this->scope = $scope;
     }
 
     public function routes() {

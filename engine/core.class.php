@@ -1,5 +1,5 @@
 <?php
-namespace Mortar\Mortar;
+namespace Mortar\Engine;
 
 use Mortar\Foundation\Traits\Singleton;
 

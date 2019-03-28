@@ -15,15 +15,15 @@ $router->get('/routes/', function() use($router) {
 });
 
 $router->group('/controller/', function($routerGroup) {
-    $routerGroup->get('/', 'Mortar\App\Controllers\TestController@test');
-    $routerGroup->get('/int:key/', 'Mortar\App\Controllers\TestController@key');
+    $routerGroup->get('/', 'TestController@test');
+    $routerGroup->get('/int:key/', 'TestController@key');
 
     $routerGroup->group('/test/', function($secondGroup) {
-        $secondGroup->get('/int:key/', 'Mortar\App\Controllers\TestController@key');
+        $secondGroup->get('/int:key/', 'TestController@key');
     }, function() {
         echo 'abc ';
     });
-}, 'Mortar\App\Middlewares\TestMiddleware');
+}, 'TestMiddleware');
 
 $router->get('/int:key/str:test?/', function($key, $test = 'default') {
     Debug::show("$key/$test");
@@ -32,4 +32,4 @@ $router->get('/int:key/str:test?/', function($key, $test = 'default') {
 
 $router->get('/middleware/', function() {
     echo '2nd';
-}, 'Mortar\App\Middlewares\TestMiddleware');
+}, 'TestMiddleware');

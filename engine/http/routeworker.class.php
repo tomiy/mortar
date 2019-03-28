@@ -111,11 +111,13 @@ class RouteWorker {
      * @return mixed           a closure or a class/function callback array
      */
     public function processCallback($callback) {
+        $router = $this->mortar->component('router');
         if(is_array($callback) || is_null($callback)) return $callback;
         if(!is_callable($callback)) {
             if(strpos($callback, '@')) {
                 list($class, $function) = explode('@', $callback);
-            } else list($class, $function) = [$callback, 'handle'];
+                $class = $router->getScope()."Controllers\\$class";
+            } else list($class, $function) = [$router->getScope()."Middlewares\\$callback", 'handle'];
                 if(method_exists($class, $function)) {
                     $callback = [new $class($this->mortar), $function];
                 }
