@@ -5,6 +5,7 @@ use Mortar\Foundation\Traits\Singleton;
 
 use Mortar\Engine\Http\Router;
 use Mortar\Engine\Build\Parser;
+use Mortar\Engine\Build\Database;
 
 class Core extends Singleton {
     private $views;
@@ -20,15 +21,17 @@ class Core extends Singleton {
      * Instanciate the paths with config values
      * Start capturing the output used for debug
      */
-    protected function __construct($request, $tplPath = VIEWS_TEMPLATES, $cmpPath = VIEWS_COMPILED) {
+    protected function __construct($request) {
         ob_start();
-        $this->setTemplatesPath(path().$tplPath);
-        $this->setCompiledPath(path().$cmpPath);
+        $this->setTemplatesPath(path().VIEWS_TEMPLATES);
+        $this->setCompiledPath(path().VIEWS_COMPILED);
 
         $this->request = $request;
 
         $this->router = new Router($this);
         $this->parser = new Parser($this);
+        $this->database = new Database();
+
         $this->variables = [];
     }
 

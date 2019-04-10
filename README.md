@@ -29,3 +29,4 @@ _it's not obligatory but strongly recommended that you put your mortar directory
 * ✅ Add a default controller/middleware scope for static router calls
 * 🚧 Add a DB manager to make generic calls
 * 🚧 Add a Model structure with relationships and elegant fetching
+* 🚧 Add a (better) dependancy injection container
