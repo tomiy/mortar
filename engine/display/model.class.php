@@ -17,7 +17,7 @@ class Model {
 
     public function find($id) {
         return $this->db->run(
-            "SELECT * FROM $table WHERE {$table}_id = :id",
+            "SELECT * FROM {$this->table} WHERE {$this->table}_id = :id",
             [
                 'id' => $id
             ])
