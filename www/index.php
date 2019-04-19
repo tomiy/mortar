@@ -1,6 +1,6 @@
 <?php require_once '../setup.php';
 
-use Mortar\Foundation\Tools\DependencyInjector;
+use Mortar\Foundation\Tools\DependencyInjector as DI;
 
 use Mortar\Engine\Core;
 
@@ -13,37 +13,50 @@ use Mortar\Engine\Build\Parser;
 use Mortar\Engine\Build\Database;
 
 //dependency injection
-$container = new DependencyInjector();
 
-$container->set('request', function($c) {
-    return new Request($_GET, $_POST, $_SESSION, $_COOKIE, $_SERVER);
+DI::set('request', function() {
+    return new Request(
+        $_GET,
+        $_POST,
+        $_SESSION,
+        $_COOKIE,
+        $_SERVER
+    );
 });
 
-$container->set('core', function($c) {
-    return new Core($c->get('request'), $c->get('router'), $c->get('parser'), $c->get('database'));
+DI::set('core', function() {
+    return new Core(
+        DI::get('request'),
+        DI::get('router'),
+        DI::get('parser'),
+        DI::get('database')
+    );
 });
 
-$container->set('routeworker', function($c) {
+DI::set('routeworker', function() {
     return new RouteWorker();
 });
 
-$container->set('routeresponse', function($c) {
-    return new RouteResponse($c->get('request'));
+DI::set('routeresponse', function() {
+    return new RouteResponse(DI::get('request'));
 });
 
-$container->set('router', function($c) {
-    return new Router($c->get('routeworker'), $c->get('routeresponse'));
+DI::set('router', function() {
+    return new Router(
+        DI::get('routeworker'),
+        DI::get('routeresponse')
+    );
 });
 
-$container->set('parser', function($c) {
+DI::set('parser', function() {
     return new Parser();
 });
 
-$container->set('database', function($c) {
-    return new Database($c->get('pdo'));
+DI::set('database', function() {
+    return new Database(DI::get('pdo'));
 });
 
-$container->set('pdo', function($c) {
+DI::set('pdo', function() {
     return new \PDO(DB_LINK, DB_USER, DB_PASS, [
         \PDO::ATTR_ERRMODE => \PDO::ERRMODE_EXCEPTION,
         \PDO::ATTR_EMULATE_PREPARES => false
@@ -51,8 +64,8 @@ $container->set('pdo', function($c) {
 });
 
 //display
-$mortar = $container->get('core');
-$router = $container->get('router');
+$mortar = DI::get('core');
+$router = DI::get('router');
 
 require_once path().APP_PARSER;
 require_once path().APP_ROUTES;

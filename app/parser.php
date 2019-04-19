@@ -1,11 +1,8 @@
 <?php
-use Mortar\Foundation\DependencyInjector;
+use Mortar\Foundation\Tools\DependencyInjector as DI;
 
-//dependency injection
-$container = DependencyInjector::getInstance();
-
-$mortar = $container->get('core');
-$parser = $container->get('parser');
+$mortar = DI::get('core');
+$parser = DI::get('parser');
 
 $parser->tag('get', function($name, $default = null) use($parser) {
     $name = $parser->parse($name);

@@ -9,7 +9,7 @@ use Mortar\App\Models\TestModel;
 class TestController extends Controller {
 
     public function test() {
-        $testmodel = (new TestModel($this->mortar))->find(1);
+        $testmodel = (new TestModel())->find(1);
         print_r($testmodel);
     }
 }

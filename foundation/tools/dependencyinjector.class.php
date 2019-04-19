@@ -1,38 +1,32 @@
 <?php
 namespace Mortar\Foundation\Tools;
 
-class DependencyInjector {
-    private $map;
-    private $objects;
+abstract class DependencyInjector {
+    private static $map = [
+        'closures' => [],
+        'parameters' => []
+    ];
+    private static $objects = [];
 
-    public function __construct() {
-        $this->map = [
-            'closures' => [],
-            'parameters' => []
-        ];
-
-        $this->objects = [];
+    public static function set($alias, $closure, $isfactory = false) {
+        self::$map['closures'][$alias] = [$isfactory, $closure];
     }
 
-    public function set($alias, $closure, $isfactory = false) {
-        $this->map['closures'][$alias] = [$isfactory, $closure];
-    }
-
-    public function get($alias) {
+    public static function get($alias) {
         if(
-            !isset($this->objects[$alias]) &&
-            !$this->map['closures'][$alias][0]
+            !isset(self::$objects[$alias]) &&
+            !self::$map['closures'][$alias][0]
         ) {
-            $this->objects[$alias] = $this->map['closures'][$alias][1]($this);
+            self::$objects[$alias] = self::$map['closures'][$alias][1]();
         }
-        return $this->objects[$alias];
+        return self::$objects[$alias];
     }
 
-    public function setParameter($alias, $parameter) {
-        $this->map['parameters'][$alias] = $parameter;
+    public static function setParameter($alias, $parameter) {
+        self::$map['parameters'][$alias] = $parameter;
     }
 
-    public function getParameter($alias) {
-        return $this->map['parameters'][$alias];
+    public static function getParameter($alias) {
+        return self::$map['parameters'][$alias];
     }
 }

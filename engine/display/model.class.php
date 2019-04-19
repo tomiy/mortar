@@ -1,14 +1,16 @@
 <?php
 namespace Mortar\Engine\Display;
 
+use Mortar\Foundation\Tools\DependencyInjector as DI;
+
 class Model {
     protected $db;
 
     protected $table;
 
-    public function __construct($database) {
+    public function __construct() {
         if(!$this->table) echo 'undefined table @'.get_class($this);
-        $this->db = $database;
+        $this->db = DI::get('database');
     }
 
     public function find($id) {
