@@ -25,7 +25,7 @@ class DependencyInjector extends Singleton {
             !isset($this->objects[$alias]) &&
             !$this->map['closures'][$alias][0]
         ) {
-            $this->objects[$alias] = $this->map['closures'][$alias]($this);
+            $this->objects[$alias] = $this->map['closures'][$alias][1]($this);
         }
         return $this->objects[$alias];
     }
