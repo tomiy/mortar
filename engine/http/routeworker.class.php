@@ -16,12 +16,14 @@ class RouteWorker {
     ];
 
     private $mortar;
-
+    private $router;
+    
     private $routectx;
     private $middlewarectx;
 
-    public function __construct($mortar) {
+    public function __construct($mortar, $router) {
         $this->mortar = $mortar;
+        $this->router = $router;
 
         $this->routectx = [];
         $this->middlewarectx = [];
@@ -111,13 +113,12 @@ class RouteWorker {
      * @return mixed           a closure or a class/function callback array
      */
     public function processCallback($callback) {
-        $router = $this->mortar->component('router');
         if(is_array($callback) || is_null($callback)) return $callback;
         if(!is_callable($callback)) {
             if(strpos($callback, '@')) {
                 list($class, $function) = explode('@', $callback);
-                $class = $router->getScope()."Controllers\\$class";
-            } else list($class, $function) = [$router->getScope()."Middlewares\\$callback", 'handle'];
+                $class = $this->router->getScope()."Controllers\\$class";
+            } else list($class, $function) = [$this->router->getScope()."Middlewares\\$callback", 'handle'];
                 if(method_exists($class, $function)) {
                     $callback = [new $class($this->mortar), $function];
                 }

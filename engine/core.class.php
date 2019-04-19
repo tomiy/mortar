@@ -21,22 +21,18 @@ class Core extends Singleton {
      * Instanciate the paths with config values
      * Start capturing the output used for debug
      */
-    protected function __construct($request) {
+    protected function __construct($request, $router, $parser, $database) {
         ob_start();
         $this->setTemplatesPath(path().VIEWS_TEMPLATES);
         $this->setCompiledPath(path().VIEWS_COMPILED);
 
         $this->request = $request;
 
-        $this->router = new Router($this);
-        $this->parser = new Parser($this);
-        $this->database = new Database();
+        $this->router = $router;
+        $this->parser = $parser;
+        $this->database = $database;
 
         $this->variables = [];
-    }
-
-    public function component($component) {
-        return $this->$component;
     }
 
     //shorthands

@@ -1,8 +1,9 @@
 <?php
-use Mortar\Engine\Core;
-use Mortar\Foundation\Tools\Debug;
+use Mortar\Foundation\DependencyInjector;
 
-$mortar = Core::getInstance();
-$router = $mortar->component('router');
+$container = DependencyInjector::getInstance();
+
+$mortar = $container->get('core');
+$router = $container->get('router');
 
 $router->get('/', 'TestController@test');

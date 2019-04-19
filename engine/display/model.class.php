@@ -9,10 +9,10 @@ class Model {
 
     protected $table;
 
-    public function __construct($mortar) {
+    public function __construct($mortar, $database) {
         if(!$this->table) echo 'undefined table @'.get_class($this);
         $this->mortar = $mortar;
-        $this->db = $mortar->component('database');
+        $this->db = $database;
     }
 
     public function find($id) {

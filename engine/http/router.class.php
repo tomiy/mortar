@@ -1,10 +1,9 @@
 <?php
 namespace Mortar\Engine\Http;
 
-use Mortar\Foundation\Traits\Singleton;
-
 use Mortar\Engine\Core;
 use Mortar\Engine\Http\RouteWorker;
+use Mortar\Engine\Http\RouteResponse;
 
 class Router {
     /**
@@ -24,10 +23,10 @@ class Router {
      * @param string $prefix the route group
      * @param mixed  $before the group middleware
      */
-    public function __construct($mortar) {
-        $this->response = new RouteResponse($mortar->request);
+    public function __construct($mortar, $worker, $response) {
         $this->mortar = $mortar;
-        $this->worker = new RouteWorker($mortar);
+        $this->worker = $worker;
+        $this->response = $response;
         $this->scope = 'Mortar\App\\';
     }
 
