@@ -1,8 +1,6 @@
 <?php
 namespace Mortar\Engine\Http;
 
-use Mortar\Engine\Core;
-
 class RouteWorker {
 
     /**
@@ -15,18 +13,23 @@ class RouteWorker {
         'all' => '[\w-]'
     ];
 
-    private $mortar;
-    private $router;
+    private $scope = 'Mortar\App\\';
     
     private $routectx;
     private $middlewarectx;
 
-    public function __construct($mortar, $router) {
-        $this->mortar = $mortar;
-        $this->router = $router;
+    public function __construct() {
 
         $this->routectx = [];
         $this->middlewarectx = [];
+    }
+
+    public function getScope() {
+        return $this->scope;
+    }
+
+    public function setScope($scope) {
+        $this->scope = $scope;
     }
 
     public function pushContext($routectx, $middlewarectx) {
@@ -117,10 +120,10 @@ class RouteWorker {
         if(!is_callable($callback)) {
             if(strpos($callback, '@')) {
                 list($class, $function) = explode('@', $callback);
-                $class = $this->router->getScope()."Controllers\\$class";
-            } else list($class, $function) = [$this->router->getScope()."Middlewares\\$callback", 'handle'];
+                $class = $this->getScope()."Controllers\\$class";
+            } else list($class, $function) = [$this->getScope()."Middlewares\\$callback", 'handle'];
                 if(method_exists($class, $function)) {
-                    $callback = [new $class($this->mortar), $function];
+                    $callback = [new $class(), $function];
                 }
         }
         return $callback;

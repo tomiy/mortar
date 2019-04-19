@@ -1,25 +1,18 @@
 <?php
 namespace Mortar\Engine\Build;
 
-use Mortar\Engine\Core;
-
 /**
  * Parses templates into php output
  */
 class Parser {
 
-    private $mortar;
     private $variables;
-    
     private $tags;
     
     /**
-     * instanciate a parser and give it a worker
-     * @param object $mortar the mortar instance
+     * instanciate a parser
      */
-    public function __construct($mortar) {
-        $this->mortar = $mortar;
-    
+    public function __construct() {
         $this->tags = [];
     }
 

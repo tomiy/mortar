@@ -1,11 +1,16 @@
 <?php require_once '../setup.php';
 
-use Mortar\Foundation\DependencyInjector;
+use Mortar\Foundation\Tools\DependencyInjector;
+
 use Mortar\Engine\Core;
+
 use Mortar\Engine\Http\Request;
 use Mortar\Engine\Http\Router;
 use Mortar\Engine\Http\RouteWorker;
 use Mortar\Engine\Http\RouteResponse;
+
+use Mortar\Engine\Build\Parser;
+use Mortar\Engine\Build\Database;
 
 //dependency injection
 $container = DependencyInjector::getInstance();
@@ -19,7 +24,7 @@ $container->set('core', function($c) {
 });
 
 $container->set('routeworker', function($c) {
-    return new RouteWorker($c->get('core'), $c->get('router'));
+    return new RouteWorker();
 });
 
 $container->set('routeresponse', function($c) {
@@ -27,11 +32,11 @@ $container->set('routeresponse', function($c) {
 });
 
 $container->set('router', function($c) {
-    return new Router($c->get('core'), $c->get('routeworker'), $c->get('routeresponse'));
+    return new Router($c->get('routeworker'), $c->get('routeresponse'));
 });
 
 $container->set('parser', function($c) {
-    return new Parser($c->get('core'));
+    return new Parser();
 });
 
 $container->set('database', function($c) {

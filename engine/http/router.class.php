@@ -1,7 +1,6 @@
 <?php
 namespace Mortar\Engine\Http;
 
-use Mortar\Engine\Core;
 use Mortar\Engine\Http\RouteWorker;
 use Mortar\Engine\Http\RouteResponse;
 
@@ -13,29 +12,16 @@ class Router {
     private $routes = [];
     private $response;
 
-    private $mortar;
     private $worker;
-
-    private $scope;
 
     /**
      * Instanciate a new router
      * @param string $prefix the route group
      * @param mixed  $before the group middleware
      */
-    public function __construct($mortar, $worker, $response) {
-        $this->mortar = $mortar;
+    public function __construct($worker, $response) {
         $this->worker = $worker;
         $this->response = $response;
-        $this->scope = 'Mortar\App\\';
-    }
-
-    public function getScope() {
-        return $this->scope;
-    }
-
-    public function setScope($scope) {
-        $this->scope = $scope;
     }
 
     public function routes() {
