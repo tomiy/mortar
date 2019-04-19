@@ -12,14 +12,22 @@ class DependencyInjector extends Singleton {
             'closures' => [],
             'parameters' => []
         ];
+
+        $this->objects = [];
     }
 
-    public function set($alias, $closure) {
-        $this->map['closures'][$alias] = $closure;
+    public function set($alias, $closure, $isfactory = false) {
+        $this->map['closures'][$alias] = [$isfactory, $closure];
     }
 
     public function get($alias) {
-        return $this->map['closures'][$alias]($this);
+        if(
+            !isset($this->objects[$alias]) &&
+            !$this->map['closures'][$alias][0]
+        ) {
+            $this->objects[$alias] = $this->map['closures'][$alias]($this);
+        }
+        return $this->objects[$alias];
     }
 
     public function setParameter($alias, $parameter) {
