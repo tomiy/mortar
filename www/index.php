@@ -13,14 +13,14 @@ use Mortar\Engine\Build\Parser;
 use Mortar\Engine\Build\Database;
 
 //dependency injection
-$container = DependencyInjector::getInstance();
+$container = new DependencyInjector();
 
 $container->set('request', function($c) {
     return new Request($_GET, $_POST, $_SESSION, $_COOKIE, $_SERVER);
 });
 
 $container->set('core', function($c) {
-    return Core::getInstance($c->get('request'), $c->get('router'), $c->get('parser'), $c->get('database'));
+    return new Core($c->get('request'), $c->get('router'), $c->get('parser'), $c->get('database'));
 });
 
 $container->set('routeworker', function($c) {

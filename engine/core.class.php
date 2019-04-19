@@ -1,13 +1,11 @@
 <?php
 namespace Mortar\Engine;
 
-use Mortar\Foundation\Traits\Singleton;
-
 use Mortar\Engine\Http\Router;
 use Mortar\Engine\Build\Parser;
 use Mortar\Engine\Build\Database;
 
-class Core extends Singleton {
+class Core {
     private $views;
 
     private $router;
@@ -21,7 +19,7 @@ class Core extends Singleton {
      * Instanciate the paths with config values
      * Start capturing the output used for debug
      */
-    protected function __construct($request, $router, $parser, $database) {
+    public function __construct($request, $router, $parser, $database) {
         ob_start();
         $this->setTemplatesPath(path().VIEWS_TEMPLATES);
         $this->setCompiledPath(path().VIEWS_COMPILED);

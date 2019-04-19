@@ -1,13 +1,11 @@
 <?php
 namespace Mortar\Foundation\Tools;
 
-use Mortar\Foundation\Traits\Singleton;
-
-class DependencyInjector extends Singleton {
+class DependencyInjector {
     private $map;
     private $objects;
 
-    protected function __construct() {
+    public function __construct() {
         $this->map = [
             'closures' => [],
             'parameters' => []
