@@ -32,9 +32,9 @@ class RouteWorker {
         $this->scope = $scope;
     }
 
-    public function pushContext($routectx, $middlewarectx) {
+    public function pushContext($routectx, $middlewarectx, $request) {
         array_push($this->routectx, $routectx);
-        array_push($this->middlewarectx, $this->processMiddlewares($middlewarectx));
+        array_push($this->middlewarectx, $this->processMiddlewares($middlewarectx, $request));
     }
 
     public function popContext() {
@@ -42,11 +42,11 @@ class RouteWorker {
         array_pop($this->middlewarectx);
     }
 
-    public function processMiddlewares($before) {
+    public function processMiddlewares($before, $request) {
         if(!is_null($before)) {
             if(!is_array($before)) $before = [$before];
             foreach ($before as &$groupmiddleware) {
-                $groupmiddleware = $this->processCallback($groupmiddleware);
+                $groupmiddleware = $this->processCallback($groupmiddleware, $request);
             }
         }
 
@@ -115,16 +115,16 @@ class RouteWorker {
      * @param  mixed $callback the callback to process
      * @return mixed           a closure or a class/function callback array
      */
-    public function processCallback($callback) {
+    public function processCallback($callback, $request) {
         if(is_array($callback) || is_null($callback)) return $callback;
         if(!is_callable($callback)) {
             if(strpos($callback, '@')) {
                 list($class, $function) = explode('@', $callback);
                 $class = $this->getScope()."Controllers\\$class";
             } else list($class, $function) = [$this->getScope()."Middlewares\\$callback", 'handle'];
-                if(method_exists($class, $function)) {
-                    $callback = [new $class(), $function];
-                }
+            if(method_exists($class, $function)) {
+                $callback = [new $class($request), $function];
+            }
         }
         return $callback;
     }

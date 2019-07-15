@@ -86,10 +86,10 @@ class Router {
         } else $route = str_replace('/', '\/', $route);
 
         // check for controller methods
-        $callback = $this->worker->processCallback($callback);
+        $callback = $this->worker->processCallback($callback, $this->response->getRequest());
 
         // check for middleware methods
-        $before = $this->worker->processMiddlewares($before);
+        $before = $this->worker->processMiddlewares($before, $this->response->getRequest());
 
         // add route to collection
         $this->routes[$method][$route] = [
@@ -108,7 +108,7 @@ class Router {
      * @param mixed    $before   the group middleware
      */
     public function group($route, $callback, $before = null) {
-        $this->worker->pushContext($route, $before);
+        $this->worker->pushContext($route, $before, $this->response->getRequest());
         $callback($this);
         $this->worker->popContext();
     }
@@ -142,8 +142,9 @@ class Router {
                     return !is_numeric($key);
                 }, '2');
 
+
                 foreach ($before as $middleware) {
-                    call_user_func_array($middleware, $arguments);
+                    call_user_func($middleware);
                 }
 
                 call_user_func_array($callback, $arguments);

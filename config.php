@@ -15,4 +15,4 @@ define('PARSER_MASK', count_chars(PARSER_OPEN.PARSER_STOP, 3));
 define('DB_LINK', '<connection string>');
 define('DB_USER', '<user string>');
 define('DB_PASS', '<password string>');
-define('NODB', false);
+define('NODB', true);

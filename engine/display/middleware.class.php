@@ -2,6 +2,11 @@
 namespace Mortar\Engine\Display;
 
 class Middleware {
-    public function __construct() {}
+    protected $request;
+
+    public function __construct($request) {
+        $this->request = $request;
+    }
+
     public function handle() {}
 }

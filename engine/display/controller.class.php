@@ -2,5 +2,9 @@
 namespace Mortar\Engine\Display;
 
 class Controller {
-    public function __construct() {}
+    protected $request;
+
+    public function __construct($request) {
+        $this->request = $request;
+    }
 }

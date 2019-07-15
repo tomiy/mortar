@@ -10,6 +10,6 @@ class TestController extends Controller {
 
     public function test() {
         $testmodel = (new TestModel())->find(1);
-        print_r($testmodel);
+        nl2br(print_r($testmodel));
     }
 }

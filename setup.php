@@ -29,17 +29,6 @@ function relativePath($source, $destin) {
     return rtrim(str_pad('', count($arFrom) * 3, '..'.DS).implode(DS, $arTo), DS);
 }
 
-function refresh_token() {
-    $_SESSION['csrf_token'] = null;
-    generate_token();
-}
-
-function generate_token() {
-    if (empty($_SESSION['csrf_token'])) {
-        $_SESSION['csrf_token'] = bin2hex(random_bytes(32));
-    }
-}
-
 function path($path = null) {
     static $o;
     if($path) $o = $path;
@@ -51,6 +40,5 @@ spl_autoload_extensions('.class.php');
 spl_autoload_register();
 
 session_start();
-generate_token();
 
 require_once __DIR__.DS.'config.php';

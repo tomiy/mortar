@@ -14,6 +14,7 @@ class Model {
     }
 
     public function find($id) {
+        if(NODB) return;
         return $this->db->run(
             "SELECT * FROM {$this->table} WHERE {$this->table}_id = :id",
             [

@@ -16,6 +16,10 @@ class RouteResponse {
         return $this->method;
     }
 
+    public function getRequest() {
+        return $this->request;
+    }
+
     public function setNotFound($notfound) {
         $this->notfound = $notfound;
     }
@@ -27,17 +31,6 @@ class RouteResponse {
         $this->method = isset($request->post['_method'])
             && in_array(strtoupper($request->post['_method']), static::$methods)
             ?strtoupper($request->post['_method']):strtoupper($request->server['REQUEST_METHOD']);
-
-        if($this->method != 'GET') $this->checkCSRF($request->post['_token']);
-    }
-
-    public function checkCSRF($token) {
-        $calc = hash_hmac('sha256', CURRENT_URI, $this->request->session['csrf_token']);
-        if (!hash_equals($calc, $token)) {
-            header($this->request->server["SERVER_PROTOCOL"]." 403 Forbidden");
-        } else {
-            refresh_token();
-        }
     }
 
     public function notFound() {
