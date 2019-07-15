@@ -1,9 +1,6 @@
 <?php
 namespace Mortar\Engine\Http;
 
-use Mortar\Engine\Http\RouteWorker;
-use Mortar\Engine\Http\RouteResponse;
-
 class Router {
     /**
      * The routes + attached middleware

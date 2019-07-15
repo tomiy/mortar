@@ -1,10 +1,6 @@
 <?php
 namespace Mortar\Engine;
 
-use Mortar\Engine\Http\Router;
-use Mortar\Engine\Build\Parser;
-use Mortar\Engine\Build\Database;
-
 class Core {
     private $views;
 
