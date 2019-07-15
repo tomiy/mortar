@@ -57,6 +57,7 @@ DI::set('database', function() {
 });
 
 DI::set('pdo', function() {
+    if(NODB) return;
     return new \PDO(DB_LINK, DB_USER, DB_PASS, [
         \PDO::ATTR_ERRMODE => \PDO::ERRMODE_EXCEPTION,
         \PDO::ATTR_EMULATE_PREPARES => false
