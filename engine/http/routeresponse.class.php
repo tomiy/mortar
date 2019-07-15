@@ -24,7 +24,7 @@ class RouteResponse {
 
         $this->request = $request;
 
-        $this->method = isset($request->post['method'])
+        $this->method = isset($request->post['_method'])
             && in_array(strtoupper($request->post['_method']), static::$methods)
             ?strtoupper($request->post['_method']):strtoupper($request->server['REQUEST_METHOD']);
 
