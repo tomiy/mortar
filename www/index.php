@@ -14,7 +14,7 @@ use Mortar\Engine\Build\Database;
 
 //dependency injection
 
-DI::set('request', function() {
+DI::set('request', function () {
     return new Request(
         $_GET,
         $_POST,
@@ -24,7 +24,7 @@ DI::set('request', function() {
     );
 });
 
-DI::set('core', function() {
+DI::set('core', function () {
     return new Core(
         DI::get('request'),
         DI::get('router'),
@@ -33,31 +33,31 @@ DI::set('core', function() {
     );
 });
 
-DI::set('routeworker', function() {
+DI::set('routeworker', function () {
     return new RouteWorker();
 });
 
-DI::set('routeresponse', function() {
+DI::set('routeresponse', function () {
     return new RouteResponse(DI::get('request'));
 });
 
-DI::set('router', function() {
+DI::set('router', function () {
     return new Router(
         DI::get('routeworker'),
         DI::get('routeresponse')
     );
 });
 
-DI::set('parser', function() {
+DI::set('parser', function () {
     return new Parser();
 });
 
-DI::set('database', function() {
+DI::set('database', function () {
     return new Database(DI::get('pdo'));
 });
 
-DI::set('pdo', function() {
-    if(NODB) return;
+DI::set('pdo', function () {
+    if (NODB) return;
     return new \PDO(DB_LINK, DB_USER, DB_PASS, [
         \PDO::ATTR_ERRMODE => \PDO::ERRMODE_EXCEPTION,
         \PDO::ATTR_EMULATE_PREPARES => false
@@ -68,8 +68,8 @@ DI::set('pdo', function() {
 $mortar = DI::get('core');
 $router = DI::get('router');
 
-require_once path().APP_PARSER;
-require_once path().APP_ROUTES;
+require_once path() . APP_PARSER;
+require_once path() . APP_ROUTES;
 
 $router->dispatch();
 

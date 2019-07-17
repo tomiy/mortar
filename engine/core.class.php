@@ -1,7 +1,9 @@
 <?php
+
 namespace Mortar\Engine;
 
-class Core {
+class Core
+{
     private $views;
 
     private $router;
@@ -15,10 +17,11 @@ class Core {
      * Instanciate the paths with config values
      * Start capturing the output used for debug
      */
-    public function __construct($request, $router, $parser, $database) {
+    public function __construct($request, $router, $parser, $database)
+    {
         ob_start();
-        $this->setTemplatesPath(path().VIEWS_TEMPLATES);
-        $this->setCompiledPath(path().VIEWS_COMPILED);
+        $this->setTemplatesPath(path() . VIEWS_TEMPLATES);
+        $this->setCompiledPath(path() . VIEWS_COMPILED);
 
         $this->request = $request;
 
@@ -30,44 +33,57 @@ class Core {
     }
 
     //shorthands
-    public function tplpath() { return $this->views['templates']; }
-    public function cmppath() { return $this->views['compiled']; }
+    public function tplpath()
+    {
+        return $this->views['templates'];
+    }
+    public function cmppath()
+    {
+        return $this->views['compiled'];
+    }
 
-    public function setTemplatesPath($path) {
+    public function setTemplatesPath($path)
+    {
         $this->setViewPath('templates', $path);
     }
 
-    public function setCompiledPath($path) {
+    public function setCompiledPath($path)
+    {
         $this->setViewPath('compiled', $path);
     }
 
-    private function setViewPath($key, $path) {
-        if(!is_dir(realpath($path))) {
+    private function setViewPath($key, $path)
+    {
+        if (!is_dir(realpath($path))) {
             echo "Warning, folder $path does not exist.";
             return;
         }
-        $this->views[$key] = realpath($path).DS;
+        $this->views[$key] = realpath($path) . DS;
     }
 
-    public function assign($arguments) {
-        foreach($arguments as $name => $value) {
+    public function assign($arguments)
+    {
+        foreach ($arguments as $name => $value) {
             $this->variables[$name] = $value;
         }
     }
 
-    public function view($name) {
+    public function view($name)
+    {
         $this->template = $name;
     }
 
-    public function tag($tag, $callback) {
+    public function tag($tag, $callback)
+    {
         $this->parser->tag($tag, $callback);
     }
 
-    private function compile($tpl) {
-        $tplContents = file_get_contents($tplPath = $this->tplpath().$tpl.VIEWS_EXTENSION);
-        if(
-            !file_exists($cmpPath = $this->cmppath().md5($tpl).".php") ||
-            fgets(fopen($cmpPath, 'r')) != '<?php#'.filemtime($tplPath)."?>\n"
+    private function compile($tpl)
+    {
+        $tplContents = file_get_contents($tplPath = $this->tplpath() . $tpl . VIEWS_EXTENSION);
+        if (
+            !file_exists($cmpPath = $this->cmppath() . md5($tpl) . ".php") ||
+            fgets(fopen($cmpPath, 'r')) != '<?php#' . filemtime($tplPath) . "?>\n"
         ) {
             $compiled = $this->parser->parse($tplContents, filemtime($tplPath));
             file_put_contents($cmpPath, $compiled);
@@ -81,18 +97,19 @@ class Core {
      * @param  boolean $debug should we return the debug
      * @return string         the debug
      */
-    public function display($debug = false) {
+    public function display($debug = false)
+    {
         $errorReporting = ob_get_contents();
         ob_end_clean();
 
         $this->parser->loadVariables($this->variables);
 
         //display
-        if($this->template) {
+        if ($this->template) {
             $compiled = $this->compile($this->template);
             include_once $compiled;
         }
 
-        echo $debug?$errorReporting:null;
+        echo $debug ? $errorReporting : null;
     }
 }

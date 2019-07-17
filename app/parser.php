@@ -1,17 +1,18 @@
 <?php
+
 use Mortar\Foundation\Tools\DependencyInjector as DI;
 
 $mortar = DI::get('core');
 $parser = DI::get('parser');
 
-$parser->tag('get', function($name, $default = null) use($parser) {
+$parser->tag('get', function ($name, $default = null) use ($parser) {
     $name = $parser->parse($name);
     $default = $parser->parse($default);
 
     return "<?=isset(\$_GET['$name'])?\$_GET['$name']:'$default'?>";
 });
 
-$parser->tag('loop', function($counter, $content) use($parser) {
+$parser->tag('loop', function ($counter, $content) use ($parser) {
     $counter = $parser->parse($counter);
     $content = $parser->parse($content);
 
@@ -21,7 +22,7 @@ $parser->tag('loop', function($counter, $content) use($parser) {
     return $output;
 });
 
-$parser->tag('each', function($variable, $tag, $content) use($parser) {
+$parser->tag('each', function ($variable, $tag, $content) use ($parser) {
     $tag = $parser->parse($tag);
     $content = $parser->parse($content);
     $output = '';
@@ -32,13 +33,13 @@ $parser->tag('each', function($variable, $tag, $content) use($parser) {
     return $output;
 });
 
-$parser->tag('template', function($name) use($mortar, $parser) {
+$parser->tag('template', function ($name) use ($mortar, $parser) {
     $name = $parser->parse($name);
-    
+
     $cmpPath = $mortar->compile($name);
     return "<?include $cmpPath?>";
 });
 
-$parser->tag('csrf', function() {
+$parser->tag('csrf', function () {
     return '<?=hash_hmac(\'sha256\', CURRENT_URI, $_SESSION[\'csrf_token\'])?>';
 });

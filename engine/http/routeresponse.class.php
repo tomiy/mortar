@@ -1,7 +1,9 @@
 <?php
+
 namespace Mortar\Engine\Http;
 
-class RouteResponse {
+class RouteResponse
+{
     /**
      * The allowed methods (used to check for forced method via $_POST)
      * @var array
@@ -12,30 +14,35 @@ class RouteResponse {
     private $method;
     private $notfound;
 
-    public function getMethod() {
+    public function getMethod()
+    {
         return $this->method;
     }
 
-    public function getRequest() {
+    public function getRequest()
+    {
         return $this->request;
     }
 
-    public function setNotFound($notfound) {
+    public function setNotFound($notfound)
+    {
         $this->notfound = $notfound;
     }
 
-    public function __construct($request) {
+    public function __construct($request)
+    {
 
         $this->request = $request;
 
         $this->method = isset($request->post['_method'])
             && in_array(strtoupper($request->post['_method']), static::$methods)
-            ?strtoupper($request->post['_method']):strtoupper($request->server['REQUEST_METHOD']);
+            ? strtoupper($request->post['_method']) : strtoupper($request->server['REQUEST_METHOD']);
     }
 
-    public function notFound() {
-        header($this->request->server["SERVER_PROTOCOL"].' 404 Not Found');
-        if(is_callable($this->notfound)) {
+    public function notFound()
+    {
+        header($this->request->server["SERVER_PROTOCOL"] . ' 404 Not Found');
+        if (is_callable($this->notfound)) {
             call_user_func($this->notfound);
         } else die('404 Not Found');
     }

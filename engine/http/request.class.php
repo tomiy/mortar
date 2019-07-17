@@ -1,4 +1,5 @@
 <?php
+
 namespace Mortar\Engine\Http;
 
 class Request
@@ -9,7 +10,8 @@ class Request
     public $cookie;
     public $server;
 
-    public function __construct($get, $post, $session, $cookie, $server) {
+    public function __construct($get, $post, $session, $cookie, $server)
+    {
         $this->get = $get;
         $this->post = $post;
         $this->session = $session;
@@ -17,7 +19,8 @@ class Request
         $this->server = $server;
     }
 
-    public function pushToSession($index, $value) {
+    public function pushToSession($index, $value)
+    {
         $this->session[$index] = $value;
         $_SESSION[$index] = $value;
     }

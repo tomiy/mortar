@@ -1,7 +1,9 @@
 <?php
+
 namespace Mortar\Engine\Http;
 
-class RouteWorker {
+class RouteWorker
+{
 
     /**
      * The shortcuts used to parse to regex (makes route writing much easier)
@@ -14,37 +16,43 @@ class RouteWorker {
     ];
 
     private $scope = 'Mortar\App\\';
-    
+
     private $routectx;
     private $middlewarectx;
 
-    public function __construct() {
+    public function __construct()
+    {
 
         $this->routectx = [];
         $this->middlewarectx = [];
     }
 
-    public function getScope() {
+    public function getScope()
+    {
         return $this->scope;
     }
 
-    public function setScope($scope) {
+    public function setScope($scope)
+    {
         $this->scope = $scope;
     }
 
-    public function pushContext($routectx, $middlewarectx, $request) {
+    public function pushContext($routectx, $middlewarectx, $request)
+    {
         array_push($this->routectx, $routectx);
         array_push($this->middlewarectx, $this->processMiddlewares($middlewarectx, $request));
     }
 
-    public function popContext() {
+    public function popContext()
+    {
         array_pop($this->routectx);
         array_pop($this->middlewarectx);
     }
 
-    public function processMiddlewares($middlewares, $request) {
-        if(!is_null($middlewares)) {
-            if(!is_array($middlewares)) $middlewares = [$middlewares];
+    public function processMiddlewares($middlewares, $request)
+    {
+        if (!is_null($middlewares)) {
+            if (!is_array($middlewares)) $middlewares = [$middlewares];
             foreach ($middlewares as &$groupmiddleware) {
                 $groupmiddleware = $this->processCallback($groupmiddleware, $request);
             }
@@ -53,14 +61,15 @@ class RouteWorker {
         return $middlewares;
     }
 
-    public function addMiddlewares($middlewares) {
+    public function addMiddlewares($middlewares)
+    {
         $output = [];
-        if($this->middlewarectx != null) {
+        if ($this->middlewarectx != null) {
             foreach (call_user_func_array('array_merge', $this->middlewarectx) as $groupmiddleware) {
                 $output[] = $groupmiddleware;
             }
         }
-        if($middlewares != null) {
+        if ($middlewares != null) {
             foreach ($middlewares as $middleware) {
                 $output[] = $middleware;
             }
@@ -69,9 +78,10 @@ class RouteWorker {
         return $output;
     }
 
-    public function fixRoute($route) {
-        $route = '/'.trim($route,'/').($route=='/'?'':'/');
-        if($this->routectx) $route = rtrim(implode('/', $this->routectx), '/').$route;
+    public function fixRoute($route)
+    {
+        $route = '/' . trim($route, '/') . ($route == '/' ? '' : '/');
+        if ($this->routectx) $route = rtrim(implode('/', $this->routectx), '/') . $route;
         return $route;
     }
 
@@ -80,30 +90,32 @@ class RouteWorker {
      * @param  string $route the route we want to parse
      * @return string        the parsed route
      */
-    public function parseRoute($route) {
+    public function parseRoute($route)
+    {
         // check if we're at top level (recursion has slashes trimmed)
-        $parsedRoute = $route[0] == '/'?'\/':'';
+        $parsedRoute = $route[0] == '/' ? '\/' : '';
         // get route parts (array_filter to trim blank values)
         $aRoute = $remainingRoute = array_filter(explode('/', $route));
-        foreach($aRoute as $routePart) {
+        foreach ($aRoute as $routePart) {
             // if optional part
-            if(strpos($routePart, '?')) {
+            if (strpos($routePart, '?')) {
                 // go into recursion, embed the rest of the route into an optional regex
                 $remainingRoute[0] = str_replace('?', '', $routePart);
-                $parsedRoute .= '('.$this->parseRoute(implode('/', $remainingRoute)).')?';
+                $parsedRoute .= '(' . $this->parseRoute(implode('/', $remainingRoute)) . ')?';
                 break;
             }
             // if the route part is dynamic
-            if(strpos($routePart, ':')) {
+            if (strpos($routePart, ':')) {
                 list($pattern, $name) = explode(':', $routePart);
                 // replace the shorthands with regex
                 $pattern = str_replace(
                     array_keys($this->shorthands),
                     array_values($this->shorthands),
-                    empty($pattern)?'all':$pattern);
+                    empty($pattern) ? 'all' : $pattern
+                );
                 // add a nice matchable pattern to the parsed route
                 $parsedRoute .= "(?P<$name>$pattern+)\/";
-            } else $parsedRoute .= $routePart.'\/'; // else just add the part
+            } else $parsedRoute .= $routePart . '\/'; // else just add the part
             // remove the processed route part from the remaining route
             array_shift($remainingRoute);
         }
@@ -115,14 +127,15 @@ class RouteWorker {
      * @param  mixed $callback the callback to process
      * @return mixed           a closure or a class/function callback array
      */
-    public function processCallback($callback, $request) {
-        if(is_array($callback) || is_null($callback)) return $callback;
-        if(!is_callable($callback)) {
-            if(strpos($callback, '@')) {
+    public function processCallback($callback, $request)
+    {
+        if (is_array($callback) || is_null($callback)) return $callback;
+        if (!is_callable($callback)) {
+            if (strpos($callback, '@')) {
                 list($class, $function) = explode('@', $callback);
-                $class = $this->getScope()."Controllers\\$class";
-            } else list($class, $function) = [$this->getScope()."Middlewares\\$callback", 'handle'];
-            if(method_exists($class, $function)) {
+                $class = $this->getScope() . "Controllers\\$class";
+            } else list($class, $function) = [$this->getScope() . "Middlewares\\$callback", 'handle'];
+            if (method_exists($class, $function)) {
                 $callback = [new $class($request), $function];
             }
         }
