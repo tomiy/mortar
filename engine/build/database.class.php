@@ -10,6 +10,11 @@ class Database {
     }
 
     public function run($query, $parameters = []) {
+        if(!$this->pdo) {
+            echo 'Database calls are disabled in config.php (NODB)';
+            return;
+        }
+        
         if (!$parameters) {
             return $this->pdo->query($query);
         }

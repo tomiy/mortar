@@ -16,4 +16,9 @@ class Request
         $this->cookie = $cookie;
         $this->server = $server;
     }
+
+    public function pushToSession($index, $value) {
+        $this->session[$index] = $value;
+        $_SESSION[$index] = $value;
+    }
 }

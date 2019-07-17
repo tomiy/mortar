@@ -34,9 +34,9 @@ class RouteResponse {
     }
 
     public function notFound() {
-        header($this->request->server["SERVER_PROTOCOL"]." 404 Not Found");
+        header($this->request->server["SERVER_PROTOCOL"].' 404 Not Found');
         if(is_callable($this->notfound)) {
             call_user_func($this->notfound);
-        } else echo '404 Not Found';
+        } else die('404 Not Found');
     }
 }

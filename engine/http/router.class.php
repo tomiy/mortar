@@ -13,8 +13,8 @@ class Router {
 
     /**
      * Instanciate a new router
-     * @param string $prefix the route group
-     * @param mixed  $before the group middleware
+     * @param RouteWorker $worker the route worker parses routes and processes middleware calls
+     * @param RouteResponse $response the route response holds the http request and method
      */
     public function __construct($worker, $response) {
         $this->worker = $worker;
@@ -37,37 +37,37 @@ class Router {
      * Shorthand function for get requests
      * @param string $route    the route we want to match
      * @param mixed  $callback the callback called when the route is matched
-     * @param mixed  $before   the middleware called before if the route is matched
+     * @param mixed  $middlewares   the middlewares called if the route is matched
      */
-    public function get($route, $callback, $before = null) {
-        $this->addRoute('GET', $route, $callback, $before);
+    public function get($route, $callback, $middlewares = null) {
+        $this->addRoute('GET', $route, $callback, $middlewares);
     }
     /**
      * Shorthand function for post requests
      * @param string $route    the route we want to match
      * @param mixed  $callback the callback called when the route is matched
-     * @param mixed  $before   the middleware called before if the route is matched
+     * @param mixed  $middlewares   the middleware called if the route is matched
      */
-    public function post($route, $callback, $before = null) {
-        $this->addRoute('POST', $route, $callback, $before);
+    public function post($route, $callback, $middlewares = null) {
+        $this->addRoute('POST', $route, $callback, $middlewares);
     }
     /**
      * Shorthand function for put requests
      * @param string $route    the route we want to match
      * @param mixed  $callback the callback called when the route is matched
-     * @param mixed  $before   the middleware called before if the route is matched
+     * @param mixed  $middlewares   the middleware called if the route is matched
      */
-    public function put($route, $callback, $before = null) {
-        $this->addRoute('PUT', $route, $callback, $before);
+    public function put($route, $callback, $middlewares = null) {
+        $this->addRoute('PUT', $route, $callback, $middlewares);
     }
     /**
      * Shorthand function for delete requests
      * @param string $route    the route we want to match
      * @param mixed  $callback the callback called when the route is matched
-     * @param mixed  $before   the middleware called before if the route is matched
+     * @param mixed  $middlewares   the middleware called if the route is matched
      */
-    public function delete($route, $callback, $before = null) {
-        $this->addRoute('DELETE', $route, $callback, $before);
+    public function delete($route, $callback, $middlewares = null) {
+        $this->addRoute('DELETE', $route, $callback, $middlewares);
     }
 
     /**
@@ -75,9 +75,9 @@ class Router {
      * @param string $method   the method that should match this route
      * @param string $route    the route we want to match
      * @param mixed  $callback the callback called when the route is matched
-     * @param mixed  $before   the middleware called before if the route is matched
+     * @param mixed  $middlewares   the middleware called if the route is matched
      */
-    private function addRoute($method, $route, $callback, $before) {
+    private function addRoute($method, $route, $callback, $middlewares) {
         $route = $this->worker->fixRoute($route);
 
         // if dynamic route, parse, else just make it regex friendly
@@ -89,26 +89,26 @@ class Router {
         $callback = $this->worker->processCallback($callback, $this->response->getRequest());
 
         // check for middleware methods
-        $before = $this->worker->processMiddlewares($before, $this->response->getRequest());
+        $middlewares = $this->worker->processMiddlewares($middlewares, $this->response->getRequest());
 
         // add route to collection
         $this->routes[$method][$route] = [
             'callback' => $callback,
-            'before' => []
+            'middlewares' => []
         ];
 
         // add group middleware if we can
-        $this->routes[$method][$route]['before'] = $this->worker->addMiddlewares($before);
+        $this->routes[$method][$route]['middlewares'] = $this->worker->addMiddlewares($middlewares);
     }
 
     /**
      * Set a group then walk through a callback of routes to apply it
      * @param string   $route    the route prefix
      * @param callback $callback the callback of routes
-     * @param mixed    $before   the group middleware
+     * @param mixed    $middlewares   the group middleware
      */
-    public function group($route, $callback, $before = null) {
-        $this->worker->pushContext($route, $before, $this->response->getRequest());
+    public function group($route, $callback, $middlewares = null) {
+        $this->worker->pushContext($route, $middlewares, $this->response->getRequest());
         $callback($this);
         $this->worker->popContext();
     }
@@ -125,7 +125,7 @@ class Router {
             $this->routes[$this->response->getMethod()])
         ) {
             $found = true;
-            foreach ($this->routes[$this->response->getMethod()][$static_uri]['before'] as $middleware) {
+            foreach ($this->routes[$this->response->getMethod()][$static_uri]['middlewares'] as $middleware) {
                 call_user_func($middleware);
             }
             call_user_func($this->routes[$this->response->getMethod()][$static_uri]['callback']);
@@ -133,7 +133,7 @@ class Router {
         // else try looping through the table and match a regex
     } else foreach ($this->routes[$this->response->getMethod()] as $route => $callbacks) {
             $callback = $callbacks['callback'];
-            $before = $callbacks['before'];
+            $middlewares = $callbacks['middlewares'];
             // if match then callback and bail out
             if(preg_match("/^$route$/", CURRENT_URI, $arguments)) {
                 $found = true;
@@ -143,7 +143,7 @@ class Router {
                 }, '2');
 
 
-                foreach ($before as $middleware) {
+                foreach ($middlewares as $middleware) {
                     call_user_func($middleware);
                 }
 

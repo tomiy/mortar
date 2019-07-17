@@ -14,12 +14,13 @@ class Model {
     }
 
     public function find($id) {
-        if(NODB) return;
-        return $this->db->run(
+        $data = $this->db->run(
             "SELECT * FROM {$this->table} WHERE {$this->table}_id = :id",
             [
                 'id' => $id
-            ])
-        ->fetch();
+            ]);
+        if($data) {
+            return $data->fetch();
+        }
     }
 }

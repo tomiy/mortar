@@ -42,26 +42,26 @@ class RouteWorker {
         array_pop($this->middlewarectx);
     }
 
-    public function processMiddlewares($before, $request) {
-        if(!is_null($before)) {
-            if(!is_array($before)) $before = [$before];
-            foreach ($before as &$groupmiddleware) {
+    public function processMiddlewares($middlewares, $request) {
+        if(!is_null($middlewares)) {
+            if(!is_array($middlewares)) $middlewares = [$middlewares];
+            foreach ($middlewares as &$groupmiddleware) {
                 $groupmiddleware = $this->processCallback($groupmiddleware, $request);
             }
         }
 
-        return $before;
+        return $middlewares;
     }
 
-    public function addMiddlewares($before) {
+    public function addMiddlewares($middlewares) {
         $output = [];
         if($this->middlewarectx != null) {
             foreach (call_user_func_array('array_merge', $this->middlewarectx) as $groupmiddleware) {
                 $output[] = $groupmiddleware;
             }
         }
-        if($before != null) {
-            foreach ($before as $middleware) {
+        if($middlewares != null) {
+            foreach ($middlewares as $middleware) {
                 $output[] = $middleware;
             }
         }

@@ -1,7 +1,6 @@
 <?php
 namespace Mortar\App\Controllers;
 
-use Mortar\Engine\Core;
 use Mortar\Engine\Display\Controller;
 
 use Mortar\App\Models\TestModel;
